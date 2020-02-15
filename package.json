@@ -1,0 +1,28 @@
+{
+  "name": "homebridge-homekit-controller",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/martinpham/homebridge-homekit-controller.git"
+  },
+  "bin": {
+    "homekit": "./cli.js"
+  },
+  "version": "0.0.1",
+  "description": "Homebridge Homekit controller",
+  "license": "ISC",
+  "keywords": [
+    "homebridge-plugin",
+    "homebridge",
+    "api",
+    "homekit"
+  ],
+  "engines": {
+    "node": ">=0.12.0",
+    "homebridge": ">=0.2.0"
+  },
+  "dependencies": {
+    "hap-controller": "MartinPham/hap-controller-node.git#patch-2",
+    "libsodium-wrappers": "^0.7.6",
+    "terminal-kit": "^1.33.3"
+  }
+}
