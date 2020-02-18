@@ -11,7 +11,20 @@ Pair devices
 ```
 homekit [network interface]
 ```
-- Select device, and enter code to pair
+
+example
+
+```
+homekit
+```
+
+or
+
+```
+homekit wlan0
+```
+
+- Select device, and enter code to pair (including `-`, example `123-45-678`)
 - Enter filename to save pairing's informations JSON
 - Inside the JSON file, you can find
 
