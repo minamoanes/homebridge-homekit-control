@@ -300,7 +300,7 @@ class HKClient {
         if (configuredAcc === undefined) {
             // create a new accessory
             const accessory = new this.parent.api.platformAccessory(this.name, this.uuid)
-            this.parent.log.debug(`Building new Accesory ${accessory.displayName} (${accessory.UUID})`)
+            this.parent.log.debug(`Building new Accessory ${accessory.displayName} (${accessory.UUID})`)
             accessoryServices.map(sData => {
                 let service = accessory.getService(sData.create)
 
@@ -434,7 +434,7 @@ class HKPlatform {
         this.accessories = []
         const self = this        
         
-        this.clients = this.config.services.map(serviceConfig => new HKClient(serviceConfig, self))  
+        this.clients = this.config.services===undefined?[]:this.config.services.map(serviceConfig => new HKClient(serviceConfig, self))  
         
         this.api.on('didFinishLaunching', () => {
             if (this.clients.length===0){
