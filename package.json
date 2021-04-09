@@ -7,7 +7,7 @@
   "bin": {
     "homekit": "./cli.js"
   },
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "Homebridge Homekit Proxy, based on homebridge-homekit-controller by MartinPham",
   "license": "ISC",
   "keywords": [
@@ -21,6 +21,7 @@
     "homebridge": ">=0.2.0"
   },
   "dependencies": {
+    "fakegato-history": "^0.6.1",
     "hap-controller": "^0.4.0",
     "terminal-kit": "^1.33.3"
   },
