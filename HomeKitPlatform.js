@@ -1,8 +1,9 @@
 'use strict'
-const {HttpClient} = require('hap-controller')
-    , os = require('os')
+const {HttpClient} = require('hap-controller'),
+    inherits = require('util').inherits
+    
 
-let Service, Characteristic, KnownServiceMap, KnownCharMap, FakeGatoService
+let Service, Characteristic, KnownServiceMap, KnownCharMap, FakeGatoService, CustomCharacteristic
 
 function shortType(type){
     const parts = type.split('-')
@@ -81,7 +82,8 @@ function buildCharMap(){
         Characteristic.Hue,
         Characteristic.ColorTemperature,
         Characteristic.Saturation,
-        Characteristic.CurrentAmbientLightLevel
+        Characteristic.CurrentAmbientLightLevel,
+        Characteristic.AirParticulateDensity
     ]
 
     //mapping to the final data structure
@@ -116,8 +118,12 @@ class HKClient {
 
         //data
         this.supportedAccessories = []    
-        this.uuid = parent.api.hap.uuid.generate(serviceConfig.name)
-        this.name = serviceConfig.name
+        if (serviceConfig.uniquePrefix){
+            this.uuid = parent.api.hap.uuid.generate(`${serviceConfig.uniquePrefix}.${serviceConfig.name}`)
+        } else {
+            this.uuid = parent.api.hap.uuid.generate(serviceConfig.name)
+        }
+        this.name = serviceConfig.name?serviceConfig.name:'Unnamed Accessory'
         this.fakeGato = { 
             users:[],
             interval: 0,
@@ -207,6 +213,7 @@ class HKClient {
     }
 
     _updateCharacteristicValue(char, c){
+        if (!c.allowValueUpdates) {return}
         this.con().getCharacteristics(
             [c.cname],
             {
@@ -237,25 +244,29 @@ class HKClient {
         const self = this
 
         sData.characteristics.forEach((c) => {   
-            let allowValueUpdates = true
+            c.allowValueUpdates = true
+            if (c.create.UUID === Characteristic.SerialNumber.UUID && this.serviceConfig.uniquePrefix){
+                this.deviceID = c.value
+                c.allowValueUpdates = false                
+                c.value = `${this.serviceConfig.uniquePrefix}-${this.deviceID}`
+            } else if (c.create.UUID === Characteristic.Name.UUID && this.serviceConfig.name){
+                c.allowValueUpdates = false                
+                c.value = this.serviceConfig.name
+            } 
+
             if (c.source.value !== undefined) {
-                service.setCharacteristic(c.create, c.source.value)
+                service.setCharacteristic(c.create, c.value)
             }
             const char = service.getCharacteristic(c.create)
             c.connect = char
             self.copyProps(c.source, char)
 
-            if (c.create.UUID === Characteristic.SerialNumber.UUID){
-                this.deviceID = c.value
-                allowValueUpdates = false
-            }
+            
             
             
             if (c.source.perms && c.source.perms.indexOf('pr')>=0){                                                
-                char.on('get', (callback) => {
-                    if (allowValueUpdates){
-                        self._updateCharacteristicValue(char, c)                    
-                    }
+                char.on('get', (callback) => {                    
+                    self._updateCharacteristicValue(char, c)                                        
                     callback(null, c.value)
                 })                                            
             }
@@ -267,7 +278,7 @@ class HKClient {
                 })
             }
 
-            if (allowValueUpdates && c.source.perms && (c.source.perms.indexOf('ev')>=0)){
+            if (c.allowValueUpdates && c.source.perms && (c.source.perms.indexOf('ev')>=0)){
                 const cl = this.con()
                 cl.on('event', event => {
                     if (event.characteristics && event.characteristics.length>0){
@@ -364,7 +375,7 @@ class HKClient {
                 room:{
                     temp:has(Service.TemperatureSensor, Characteristic.CurrentTemperature),
                     humidity:has(Service.HumiditySensor, Characteristic.CurrentRelativeHumidity),
-                    ppm:[has(Service.CarbonDioxideSensor, Characteristic.CarbonDioxideLevel), has(Service.CarbonMonoxideSensor, Characteristic.CarbonMonoxideLevel), has(Service.AirQualitySensor, Characteristic.PM2_5Density), has(Service.AirQualitySensor, Characteristic.PM10Density)].find(i=>i!==undefined)
+                    ppm:[has(Service.CarbonDioxideSensor, Characteristic.CarbonDioxideLevel), has(Service.AirQualitySensor, Characteristic.PM2_5Density), has(Service.AirQualitySensor, Characteristic.PM10Density), has(Service.CarbonMonoxideSensor, Characteristic.CarbonMonoxideLevel), ].find(i=>i!==undefined)
                 },
                 motion:{
                     status:has(Service.MotionSensor, Characteristic.MotionDetected)
@@ -382,16 +393,41 @@ class HKClient {
         })
     }
 
+
     addFakeGatoService(fakeGato, accessory){
         //add the fakeGato service if needed
-        if (fakeGato && this.fakeGato.interval > 0){
-            accessory.getService(Service.AccessoryInformation).setCharacteristic(Characteristic.SerialNumber, os.hostname() + '-' + this.deviceID)
-
-            
+        if (fakeGato && this.fakeGato.interval > 0){            
             accessory.log = this.parent.log
             fakeGato.history.forEach(h => {
-                this.parent.log.debug(`Adding FakeGatoService '${h.type}' to '${this.name}', ${this.deviceID}, ${os.hostname()}`)
-                h.logService = new FakeGatoService(h.type, accessory, 4000)
+                const airQualityService = accessory.getService(Service.AirQualitySensor)
+                
+                if (airQualityService && h.type==='room') {                                       
+                    let airQualityC = airQualityService.getCharacteristic(CustomCharacteristic.AirQuality)
+                    
+                    let valueGetter = () => {
+                        if(h.data.ppm.UUID === Characteristic.PM2_5Density || h.data.ppm.UUID === Characteristic.PM10Density){
+                            //sems to be ug/m3 not ppm => convert like https://github.com/simont77/fakegato-history/issues/107
+                            return Math.max(500, h.data.ppm.value / 4.57)
+                        } else {
+                            return Math.max(500, h.data.ppm.value)
+                        }
+                    }
+                    if (airQualityC===undefined) {
+                        this.parent.log.debug(`Adding Eve PPM Characteristic to '${this.name}', ${this.deviceID}, ${this.serviceConfig.uniquePrefix?this.serviceConfig.uniquePrefix:''} = ${valueGetter()}`)
+                        airQualityC = airQualityService.setCharacteristic(CustomCharacteristic.AirQuality, valueGetter())
+                    } else {
+                        this.parent.log.debug(`Updating initial value for Eve PPM Characteristic to ${valueGetter()}`)
+                        airQualityC.updateValue(valueGetter())
+                    }
+
+                    airQualityC.onGet(async ()=> valueGetter())
+                }
+                
+                h.logService = accessory.getService(FakeGatoService)
+                if (h.logService === undefined){
+                    this.parent.log.debug(`Adding FakeGatoService '${h.type}' to '${this.name}', ${this.deviceID}, ${this.serviceConfig.uniquePrefix?this.serviceConfig.uniquePrefix:''}`)
+                    h.logService = new FakeGatoService(h.type, accessory, {size:4000,disableTimer:true})                    
+                }
             })
         }
     }
@@ -407,8 +443,13 @@ class HKClient {
                 }
                 Object.keys(h.data).forEach(k=> {
                     const c = h.data[k]
-                    data[k] = c.value
-
+                    
+                    if (k==='ppm') {
+                        data[k] = Math.max(500, c.value)
+                    } else {
+                        data[k] = c.value
+                    }
+                    
                     //no auto updates, so trigger manual reads
                     //if (c.source.perms && (c.source.perms.indexOf('ev')<0))
                     {
@@ -481,6 +522,27 @@ module.exports = function (service, characteristic, homebridge) {
     Service = service
     Characteristic = characteristic
     FakeGatoService = require('fakegato-history')(homebridge)
+
+
+    
+    CustomCharacteristic={}
+    CustomCharacteristic.AirQuality = function () {
+        Characteristic.call(this, 'Air Quality PM25', 'E863F10B-079E-48FF-8F27-9C2605A29F52')
+        this.setProps({
+            format: Characteristic.Formats.UINT16,
+            unit: 'ppm',
+            maxValue: 99999,
+            minValue: 500,
+            minStep: 1,
+            perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
+        })
+        this.value = this.getDefaultValue()
+    }
+    CustomCharacteristic.AirQuality.UUID = 'E863F10B-079E-48FF-8F27-9C2605A29F52'
+    CustomCharacteristic.AirQuality.uuid = 'E863F10B-079E-48FF-8F27-9C2605A29F52'
+    
+    inherits(CustomCharacteristic.AirQuality, Characteristic)
+
 
     buildServiceList()
     buildCharMap()
