@@ -7,7 +7,7 @@
   "bin": {
     "homekit": "./cli.js"
   },
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Homebridge Homekit controller",
   "license": "ISC",
   "keywords": [
@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "hap-controller": "^0.4.0",
-    "libsodium-wrappers": "^0.7.6",
     "terminal-kit": "^1.33.3"
   },
   "devDependencies": {
