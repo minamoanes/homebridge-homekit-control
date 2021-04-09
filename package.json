@@ -22,7 +22,9 @@
   },
   "dependencies": {
     "fakegato-history": "^0.6.1",
-    "hap-controller": "^0.4.0"
+    "hap-controller": "^0.4.0",
+    "libsodium-wrappers": "^0.7.9",
+    "terminal-kit": "^2.0.7"
   },
   "devDependencies": {
     "eslint": "^7.23.0"
