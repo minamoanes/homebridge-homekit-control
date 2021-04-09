@@ -237,9 +237,8 @@ class HKClient {
         const self = this
 
         sData.characteristics.forEach((c) => {   
-            if (c.create.UUID === Characteristic.name.UUID){
-                service.setCharacteristic(c.create, this.name)
-            } else if (c.source.value !== undefined) {
+            let allowValueUpdates = true
+            if (c.source.value !== undefined) {
                 service.setCharacteristic(c.create, c.source.value)
             }
             const char = service.getCharacteristic(c.create)
@@ -248,12 +247,15 @@ class HKClient {
 
             if (c.create.UUID === Characteristic.SerialNumber.UUID){
                 this.deviceID = c.value
+                allowValueUpdates = false
             }
             
             
             if (c.source.perms && c.source.perms.indexOf('pr')>=0){                                                
                 char.on('get', (callback) => {
-                    self._updateCharacteristicValue(char, c)                    
+                    if (allowValueUpdates){
+                        self._updateCharacteristicValue(char, c)                    
+                    }
                     callback(null, c.value)
                 })                                            
             }
@@ -265,7 +267,7 @@ class HKClient {
                 })
             }
 
-            if (c.source.perms && (c.source.perms.indexOf('ev')>=0)){
+            if (allowValueUpdates && c.source.perms && (c.source.perms.indexOf('ev')>=0)){
                 const cl = this.con()
                 cl.on('event', event => {
                     if (event.characteristics && event.characteristics.length>0){
