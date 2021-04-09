@@ -62,26 +62,26 @@ Config
 ===
 ```
 {
-	"platforms": [
-		{
-			"platform": "HomeKitController",            
-			"services": [
-				{
-					"id": "device id",
-					"name": "device name",
-					"address": "device ip",
-					"port": "device port",
-				    "pairingData": {
-				        "AccessoryPairingID": "xxx",
-				        "AccessoryLTPK": "xxx",
-				        "iOSDevicePairingID": "xxx",
-				        "iOSDeviceLTSK": "xxx",
-				        "iOSDeviceLTPK": "xxx"
-				    }
-				}
-			]
-		}	
-	]
+    "platforms": [
+        {
+            "platform": "HomeKitController",            
+            "services": [
+                {
+                    "id": "device id",
+                    "name": "device name",
+                    "address": "device ip",
+                    "port": "device port",
+                    "pairingData": {
+                        "AccessoryPairingID": "xxx",
+                        "AccessoryLTPK": "xxx",
+                        "iOSDevicePairingID": "xxx",
+                        "iOSDeviceLTSK": "xxx",
+                        "iOSDeviceLTPK": "xxx"
+                    }
+                }
+            ]
+        }    
+    ]
 }
 ```
 
