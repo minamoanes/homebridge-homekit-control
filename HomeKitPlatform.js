@@ -231,7 +231,7 @@ class HKClient {
             }
         ).then((data) => {
             c.value = data.characteristics[0].value
-            this.parent.log('Received Value', c.cname, c.value)
+            this.parent.log.debug('Received Value', c.cname, c.value)
             
             char.updateValue(c.value)                                
         }).catch((e) => this.parent.log.error('get', c.cname, e))
