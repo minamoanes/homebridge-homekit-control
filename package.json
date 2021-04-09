@@ -21,8 +21,11 @@
     "homebridge": ">=0.2.0"
   },
   "dependencies": {
-    "hap-controller": "MartinPham/hap-controller-node.git#patch-2",
+    "hap-controller": "^0.4.0",
     "libsodium-wrappers": "^0.7.6",
     "terminal-kit": "^1.33.3"
+  },
+  "devDependencies": {
+    "eslint": "^7.23.0"
   }
 }
