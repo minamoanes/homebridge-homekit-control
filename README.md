@@ -50,11 +50,15 @@ homekit wlan0
 - 
 The Plugin currently supports the following Services:
  - `Switch`
+ - `Outlet`
  - `Motion Sensors`
  - `Temperatur Sensors`
  - `Humidity Sensors`
  - `CO2 Sensors`
+-  `Carbon Monoxid Sensors`
  - `Air Quality Sensors`
+ - `Ambient Light Sensors`
+ - `Light Bulbs`
 
 All sensors available on any paired device are automatically dicovered when HomeBridge starts up.
 
@@ -62,26 +66,26 @@ Config
 ===
 ```
 {
-	"platforms": [
-		{
-			"platform": "HomeKitController",            
-			"services": [
-				{
-					"id": "device id",
-					"name": "device name",
-					"address": "device ip",
-					"port": "device port",
-				    "pairingData": {
-				        "AccessoryPairingID": "xxx",
-				        "AccessoryLTPK": "xxx",
-				        "iOSDevicePairingID": "xxx",
-				        "iOSDeviceLTSK": "xxx",
-				        "iOSDeviceLTPK": "xxx"
-				    }
-				}
-			]
-		}	
-	]
+    "platforms": [
+        {
+            "platform": "HomeKitController",            
+            "services": [
+                {
+                    "id": "device id",
+                    "name": "device name",
+                    "address": "device ip",
+                    "port": "device port",
+                    "pairingData": {
+                        "AccessoryPairingID": "xxx",
+                        "AccessoryLTPK": "xxx",
+                        "iOSDevicePairingID": "xxx",
+                        "iOSDeviceLTSK": "xxx",
+                        "iOSDeviceLTPK": "xxx"
+                    }
+                }
+            ]
+        }    
+    ]
 }
 ```
 

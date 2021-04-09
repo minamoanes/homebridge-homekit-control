@@ -34,12 +34,16 @@ function buildServiceList(){
         Service.HumiditySensor,
         Service.TemperatureSensor,
         Service.CarbonDioxideSensor,
+        Service.CarbonMonoxideSensor,
         Service.AirQualitySensor,
         Service.ProtocolInformation,
         Service.AccessoryInformation,
         Service.Switch,
-        Service.Motion,
-        Service.MotionSensor
+        Service.MotionSensor,
+        Service.BatteryService,
+        Service.Lightbulb,
+        Service.Outlet,
+        Service.LightSensor
     ]
 
     //mapping to the final data structure
@@ -57,15 +61,28 @@ function buildCharMap(){
         Characteristic.HardwareRevision,
         Characteristic.ProductData,
         Characteristic.Version,
+        Characteristic.IsConfigured,
         Characteristic.AirQuality,
         Characteristic.PM2_5Density,
         Characteristic.PM10Density,
         Characteristic.CarbonDioxideDetected,
         Characteristic.CarbonDioxideLevel,
+        Characteristic.CarbonDioxidePeakLevel,
+        Characteristic.CarbonMonoxideDetected,
+        Characteristic.CarbonMonoxideLevel,
+        Characteristic.CarbonMonoxidePeakLevel,
         Characteristic.CurrentTemperature,
         Characteristic.CurrentRelativeHumidity,
         Characteristic.On,
+        Characteristic.OutletInUse,
         Characteristic.MotionDetected,
+        Characteristic.StatusLowBattery,
+        Characteristic.BatteryLevel,
+        Characteristic.Brightness,
+        Characteristic.Hue,
+        Characteristic.ColorTemperature,
+        Characteristic.Saturation,
+        Characteristic.CurrentAmbientLightLevel
     ]
 
     //mapping to the final data structure
