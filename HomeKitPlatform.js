@@ -39,7 +39,6 @@ function buildServiceList(){
         Service.ProtocolInformation,
         Service.AccessoryInformation,
         Service.Switch,
-        Service.Motion,
         Service.MotionSensor,
         Service.BatteryService,
         Service.Lightbulb,
