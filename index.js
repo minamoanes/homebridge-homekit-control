@@ -11,7 +11,7 @@ module.exports = function(homebridge) {
     Characteristic = homebridge.hap.Characteristic    
    
 
-    const HKPlatform = require('./HomeKitPlatform.js')(Service, Characteristic).HKPlatform
+    const HKPlatform = require('./HomeKitPlatform.js')(Service, Characteristic, homebridge).HKPlatform
         
     homebridge.registerPlatform('homebridge-homekit-controller', 'HomeKitController', HKPlatform, true)
 }

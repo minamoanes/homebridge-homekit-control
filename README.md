@@ -75,6 +75,7 @@ Config
                     "name": "device name",
                     "address": "device ip",
                     "port": "device port",
+                    "historyInterval": 0
                     "pairingData": {
                         "AccessoryPairingID": "xxx",
                         "AccessoryLTPK": "xxx",
@@ -89,3 +90,4 @@ Config
 }
 ```
 
+- `historyInterval`: **0** will disable fakeGato, any other positive value (in seconds) will enable the fakeGato-Service for compatible Sensors. This will allow you to view a history in the Eve-App. The valus range is [0, 600].
