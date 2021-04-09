@@ -14,7 +14,7 @@ function shortType(type){
     }
 }
 
-function mapShort(list){
+function mapShort(list){    
     return list.map(s => {
         return [
             {
@@ -83,7 +83,8 @@ function buildCharMap(){
         Characteristic.ColorTemperature,
         Characteristic.Saturation,
         Characteristic.CurrentAmbientLightLevel,
-        Characteristic.AirParticulateDensity
+        Characteristic.AirParticulateDensity,
+        Characteristic.ChargingState
     ]
 
     //mapping to the final data structure
@@ -156,6 +157,12 @@ class HKClient {
                             value: c.value,
                             source:c
                         }
+                    }).filter(c => {
+                        if (c.create === undefined){
+                            this.parent.log.warn(`Missing Type ${c.source.type}`)
+                            return false
+                        }
+                        return true
                     }),
                     source:s
                 }
@@ -244,7 +251,7 @@ class HKClient {
         const self = this
 
         sData.characteristics.forEach((c) => {   
-            c.allowValueUpdates = true
+            c.allowValueUpdates = true            
             if (c.create.UUID === Characteristic.SerialNumber.UUID && this.serviceConfig.uniquePrefix){
                 this.deviceID = c.value
                 c.allowValueUpdates = false                
