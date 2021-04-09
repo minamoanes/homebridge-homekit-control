@@ -2,13 +2,13 @@
   "name": "homebridge-homekit-controller",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/martinpham/homebridge-homekit-controller.git"
+    "url": "git+ssh://git@github.com:quiqueck/homebridge-homekit-controller.git"
   },
   "bin": {
     "homekit": "./cli.js"
   },
   "version": "0.0.3",
-  "description": "Homebridge Homekit controller",
+  "description": "Homebridge Homekit Proxy, based on homebridge-homekit-controller by MartinPham",
   "license": "ISC",
   "keywords": [
     "homebridge-plugin",
