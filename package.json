@@ -7,7 +7,7 @@
   "bin": {
     "homekit": "./cli.js"
   },
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Homebridge Homekit Proxy, based on homebridge-homekit-controller by MartinPham",
   "license": "ISC",
   "keywords": [
