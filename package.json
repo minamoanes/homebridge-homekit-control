@@ -22,8 +22,7 @@
   },
   "dependencies": {
     "fakegato-history": "^0.6.1",
-    "hap-controller": "^0.4.0",
-    "terminal-kit": "^1.33.3"
+    "hap-controller": "^0.4.0"
   },
   "devDependencies": {
     "eslint": "^7.23.0"
