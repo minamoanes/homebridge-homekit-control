@@ -3,74 +3,74 @@
 const sodium = require('libsodium-wrappers');
 
 (async() => {
-    await sodium.ready;
+    await sodium.ready
 
-    const {IPDiscovery, HttpClient} = require('hap-controller');
-    const term = require( 'terminal-kit' ).terminal;
+    const {IPDiscovery, HttpClient} = require('hap-controller')
+    const term = require( 'terminal-kit' ).terminal
 
-    const fs = require('fs');
+    const fs = require('fs')
 
 
     const discover = () => (
         new Promise((resolve, reject) => {
-            term.clear();
-            const ipDiscovery = new IPDiscovery(process.argv[2]);
-            const discoveryTimeout = 30;
-            const services = [];
+            term.clear()
+            const ipDiscovery = new IPDiscovery(process.argv[2])
+            const discoveryTimeout = 30
+            const services = []
             ipDiscovery.on('serviceUp', (service) => {
-                services.push(service);
-            });
-            ipDiscovery.start();
+                services.push(service)
+            })
+            ipDiscovery.start()
         
-            let discoveryTime = 0;
+            let discoveryTime = 0
             progressBar = term.progressBar({
                 width: 70,
                 percent: true,
                 eta: true,
-                title: "Discovering services",
+                title: 'Discovering services',
                 titleSize: 29
-            });
+            })
             
             const discoveryInterval = setInterval(() => {
-                discoveryTime++;
-                progressBar.update(discoveryTime / discoveryTimeout);
+                discoveryTime++
+                progressBar.update(discoveryTime / discoveryTimeout)
         
                 if(discoveryTime >= discoveryTimeout)
                 {
-                    clearInterval(discoveryInterval);
-                    ipDiscovery.stop();
+                    clearInterval(discoveryInterval)
+                    ipDiscovery.stop()
 
-                    resolve(services);
+                    resolve(services)
                 }
-            }, 1000);
+            }, 1000)
         })
-    );
+    )
     
     
-    const services = await discover();
+    const services = await discover()
     if(services.length === 0)
     {
-	process.exit();
+        process.exit()
     }
     
     const selectService = (services) => (
         new Promise((resolve, reject) => {
-            term.clear();
-            term('Please select a service:');
-            const serviceMenuItems = services.map(service => `${service.name} (${service.id})`);
+            term.clear()
+            term('Please select a service:')
+            const serviceMenuItems = services.map(service => `${service.name} (${service.id})`)
             
             term.singleColumnMenu(serviceMenuItems, (error, response) => {
-                const service = services[response.selectedIndex];
-                resolve(service);
-            });
+                const service = services[response.selectedIndex]
+                resolve(service)
+            })
         })
     )
 
-    const service = await selectService(services);
+    const service = await selectService(services)
 
     const pairService = (service) => (
         new Promise((resolve, reject) => {
-            term.clear();
+            term.clear()
             term('Enter PIN for ' + service.name + ' (XXX-XX-XXX): ')
             term.inputField({
                 
@@ -79,51 +79,49 @@ const sodium = require('libsodium-wrappers');
                     service.id, 
                     service.address, 
                     service.port
-                );
+                )
 
-                await ipClient.pairSetup(input);
+                await ipClient.pairSetup(input)
 
-                resolve(ipClient);
-            });
+                resolve(ipClient)
+            })
         })
     )
 
-    const client = await pairService(service);
+    const client = await pairService(service)
 
     const saveServiceData = (service, client) => (
         new Promise((resolve, reject) => {
-            term.clear();
+            term.clear()
 
-            const pairingData = client.getLongTermData();
-            term('Enter service data file name for saving: ');
+            const pairingData = client.getLongTermData()
+            term('Enter service data file name for saving: ')
 
             term.inputField({
                 default: `${service.id}.json`.replace(/:/g, '-')
             }, async (error, input) => {
-                const accessories = await client.getAccessories();
+                const accessories = await client.getAccessories()
                 const data = {
-                    service: {
-                        id: service.id,
-                        name: service.name,
-                        address: service.address,
-                        port: service.port,
-                    },
+                    id: service.id,
+                    name: service.name,
+                    address: service.address,
+                    port: service.port,                    
                     pairingData,
                     accessories
                 }
 
-                fs.writeFileSync(input, JSON.stringify(data));
-                resolve(data);
-            });
+                fs.writeFileSync(input, JSON.stringify(data, null, 4))
+                resolve(data)
+            })
         })
     )
 
 
 
-    const data = await saveServiceData(service, client);
-    term.clear();
+    const data = await saveServiceData(service, client)
+    term.clear()
     console.log(data)
-    process.exit();
+    process.exit()
 
 
     // const dataFile = 'data.json';
@@ -263,7 +261,7 @@ const sodium = require('libsodium-wrappers');
     // }
     
     
-})();
+})()
 
 
 

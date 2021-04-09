@@ -2,13 +2,13 @@
   "name": "homebridge-homekit-controller",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/martinpham/homebridge-homekit-controller.git"
+    "url": "git+ssh://git@github.com:quiqueck/homebridge-homekit-controller.git"
   },
   "bin": {
     "homekit": "./cli.js"
   },
-  "version": "0.0.1",
-  "description": "Homebridge Homekit controller",
+  "version": "0.0.3",
+  "description": "Homebridge Homekit Proxy, based on homebridge-homekit-controller by MartinPham",
   "license": "ISC",
   "keywords": [
     "homebridge-plugin",
@@ -21,8 +21,10 @@
     "homebridge": ">=0.2.0"
   },
   "dependencies": {
-    "hap-controller": "MartinPham/hap-controller-node.git#patch-2",
-    "libsodium-wrappers": "^0.7.6",
+    "hap-controller": "^0.4.0",
     "terminal-kit": "^1.33.3"
+  },
+  "devDependencies": {
+    "eslint": "^7.23.0"
   }
 }

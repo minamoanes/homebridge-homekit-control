@@ -30,12 +30,10 @@ homekit wlan0
 
 ```
 {
-    "service": {
-        "id": "device id",
-        "name": "device name",
-        "address": "device ip",
-        "port": device-port
-    },
+    "id": "device id",
+    "name": "device name",
+    "address": "device ip",
+    "port": device-port,
     "pairingData": {
         "AccessoryPairingID": "xxx",
         "AccessoryLTPK": "xxx",
@@ -48,10 +46,17 @@ homekit wlan0
     }
 }
 ```
-- Note down the `"service"`, `"pairingData"`, and `"aid"` & `"iid"` under `"accessories"`.
-- Get all the UUID here [https://gist.github.com/mplewis/def678dc4b6e63a86905](https://gist.github.com/mplewis/def678dc4b6e63a86905)
-- Currently, I support `Switch`, `Motion sensor`, `Temperature sensor` and `Humidity sensor`. I will try to add more services!
+- Note down the `"id"`, `"name"`, `"address"`, `"port"` and `"pairingData"`
+- 
+The Plugin currently supports the following Services:
+ - `Switch`
+ - `Motion Sensors`
+ - `Temperatur Sensors`
+ - `Humidity Sensors`
+ - `CO2 Sensors`
+ - `Air Quality Sensors`
 
+All sensors available on any paired device are automatically dicovered when HomeBridge starts up.
 
 Config
 ===
@@ -59,7 +64,7 @@ Config
 {
 	"platforms": [
 		{
-			"platform": "HomeKitController",
+			"platform": "HomeKitController",            
 			"services": [
 				{
 					"id": "device id",
@@ -72,15 +77,7 @@ Config
 				        "iOSDevicePairingID": "xxx",
 				        "iOSDeviceLTSK": "xxx",
 				        "iOSDeviceLTPK": "xxx"
-				    },
-					"accessories": [
-						{
-							"aid": "characteristic aid",
-							"iid": "characteristic iid",
-							"type" : "service type (eg. 00000082-0000-1000-8000-0026BB765291)",
-							"name": "Humidity Sensor 1"
-						}
-					]
+				    }
 				}
 			]
 		}	
