@@ -7,7 +7,7 @@
   "bin": {
     "homekit": "./cli.js"
   },
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Homebridge Homekit controller",
   "license": "ISC",
   "keywords": [

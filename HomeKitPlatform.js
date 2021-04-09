@@ -36,7 +36,10 @@ function buildServiceList(){
         Service.CarbonDioxideSensor,
         Service.AirQualitySensor,
         Service.ProtocolInformation,
-        Service.AccessoryInformation
+        Service.AccessoryInformation,
+        Service.Switch,
+        Service.Motion,
+        Service.MotionSensor
     ]
 
     //mapping to the final data structure
@@ -61,6 +64,8 @@ function buildCharMap(){
         Characteristic.CarbonDioxideLevel,
         Characteristic.CurrentTemperature,
         Characteristic.CurrentRelativeHumidity,
+        Characteristic.On,
+        Characteristic.MotionDetected,
     ]
 
     //mapping to the final data structure
