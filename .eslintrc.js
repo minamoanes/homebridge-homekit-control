@@ -25,6 +25,10 @@ module.exports = {
             'error',
             'never'
         ],
-        'no-multi-spaces': ['error']
+        'no-multi-spaces': ['error'],
+        'curly': [
+            'error',
+            'all'
+        ]
     }
 }
