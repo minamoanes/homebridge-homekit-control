@@ -465,7 +465,7 @@ class HKClient {
                     }
                 })
                 
-                console.log(h.type, data)
+                this.parent.log(h.type, data)
                 h.logService.addEntry(data)
             })
             
