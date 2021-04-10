@@ -1,32 +1,58 @@
 {
-  "name": "homebridge-homekit-controller",
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com:quiqueck/homebridge-homekit-controller.git"
-  },
-  "bin": {
-    "homekit": "./cli.js"
-  },
-  "version": "0.0.5",
-  "description": "Homebridge Homekit Proxy, based on homebridge-homekit-controller by MartinPham",
-  "license": "ISC",
-  "keywords": [
-    "homebridge-plugin",
-    "homebridge",
-    "api",
-    "homekit"
-  ],
-  "engines": {
-    "node": ">=0.12.0",
-    "homebridge": ">=0.2.0"
-  },
-  "dependencies": {
-    "fakegato-history": "^0.6.1",
-    "hap-controller": "^0.4.0",
-    "libsodium-wrappers": "^0.7.9",
-    "terminal-kit": "^2.0.7"
-  },
-  "devDependencies": {
-    "eslint": "^7.23.0"
-  }
+    "name": "homebridge-homekit-controller",
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com:quiqueck/homebridge-homekit-controller.git"
+    },
+    "version": "0.0.5",
+    "bin": {
+        "homekit": "./cli.js"
+    },
+    "scripts": {
+        "dev": "nodemon",
+        "build": "tsc -p tsconfig.json",
+        "prepublish": "npm run build"
+    },
+    "description": "Homebridge Homekit Proxy (Based on homebridge-homekit-controller by MartinPham)",
+    "author": "F. Bauer ",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/quiqueck/homebridge-homekit-controller/issues"
+    },
+    "homepage": "https://github.com/quiqueck/homebridge-homekit-controller#readme",
+    "keywords": [
+        "homebridge-plugin",
+        "homebridge",
+        "api",
+        "homekit",
+        "fakegato"
+    ],
+    "engines": {
+        "node": ">=0.12.0",
+        "homebridge": ">=0.2.0"
+    },
+    "dependencies": {
+        "fakegato-history": "^0.6.1",
+        "hap-controller": "^0.4.0",
+        "libsodium-wrappers": "^0.7.9",
+        "terminal-kit": "^2.0.7"
+    },
+    "devDependencies": {
+        "@types/node": "^14.14.22",
+        "@typescript-eslint/eslint-plugin": "^4.14.0",
+        "@typescript-eslint/parser": "^4.14.0",
+        "eslint": "^7.23.0",
+        "eslint-config-prettier": "^7.2.0",
+        "eslint-import-resolver-typescript": "^2.3.0",
+        "eslint-plugin-html": "^6.1.1",
+        "eslint-plugin-import": "^2.22.1",
+        "eslint-plugin-json": "^2.1.2",
+        "eslint-plugin-prettier": "^3.1.3",
+        "eslint-plugin-vue": "^7.8.0",
+        "homebridge": "^1.3.4",
+        "nodemon": "^2.0.7",
+        "prettier": "^2.2.1",
+        "ts-node": "^9.1.1",
+        "typescript": "^4.1.3"
+    }
 }
