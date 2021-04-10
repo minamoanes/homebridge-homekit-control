@@ -1,34 +1,53 @@
 module.exports = {
-    'env': {
-        'browser': true,
-        'commonjs': true,
-        'es2021': true
+    env: {
+        es6: true,
+        node: true,
+        browser: true,
     },
-    'extends': 'eslint:recommended',
-    'parserOptions': {
-        'ecmaVersion': 12
+    extends: ['plugin:prettier/recommended', 'eslint:recommended', 'plugin:vue/essential', 'plugin:@typescript-eslint/eslint-recommended'],
+    globals: {
+        Atomics: 'readonly',
+        SharedArrayBuffer: 'readonly',
     },
-    'rules': {
-        'indent': [
+    parserOptions: {
+        ecmaVersion: 2020,
+        parser: '@typescript-eslint/parser',
+        sourceType: 'module',
+    },
+    plugins: ['vue', 'prettier', '@typescript-eslint'],
+    rules: {
+        'prettier/prettier': [
             'error',
-            4
+            {
+                tabWidth: 4,
+                printWidth: 200,
+                vueIndentScriptAndStyle: false,
+                semi: false,
+                singleQuote: true,
+                quoteProps: 'as-needed',
+            },
         ],
-        'linebreak-style': [
+        'linebreak-style': ['error', 'unix'],
+        curly: ['error', 'all'],
+        'no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars': [
             'error',
-            'unix'
+            {
+                vars: 'all',
+                args: 'after-used',
+                ignoreRestSiblings: false,
+            },
         ],
-        'quotes': [
+        'vue/html-indent': [
             'error',
-            'single'
+            4,
+            {
+                attribute: 1,
+                baseIndent: 1,
+                closeBracket: 0,
+                alignAttributesVertically: true,
+                ignores: [],
+            },
         ],
-        'semi': [
-            'error',
-            'never'
-        ],
-        'no-multi-spaces': ['error'],
-        'curly': [
-            'error',
-            'all'
-        ]
-    }
+    },
 }
