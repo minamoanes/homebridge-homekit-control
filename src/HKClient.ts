@@ -407,7 +407,7 @@ export class HKClient implements IHKClient {
     addFakeGatoService(fakeGato: FakeGatoProvider, accessory: PlatformAccessory) {
         //add the fakeGato service if needed
         if (fakeGato && this.fakeGato.interval > 0) {
-            ;(accessory as any).log = this.parent.log
+            (accessory as any).log = this.parent.log
             fakeGato.history.forEach((h) => {
                 const airQualityService = accessory.getService(this.parent.api.hap.Service.AirQualitySensor)
 
