@@ -1,3 +1,6 @@
+
+HomeKit proxy allows you to controll HomeKit enabled Devices from HomeBridge. This is especially usefull if you want to allow Android/Linux or Windows users to access HomeKit-Exclusive devices. This is an almost complete rewrite of the original homebridge-homekit-controller by MartinPham. 
+
 The Plugin currently supports the following Services provided by **WLAN**-based HomeKit enabled devices:
  - `Switch`
  - `Outlet`
@@ -17,7 +20,6 @@ All supported sensors on any configured device are automatically dicovered and a
 # Install
 ```
 sudo npm i -g homebridge-homekit-proxy
-
 ```
 
 or if you'd like to run the beta versions, you can use

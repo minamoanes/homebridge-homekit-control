@@ -17,7 +17,7 @@
         "gobeta": "npm version prepatch --preid beta && npm publish --tag=beta",
         "prepublishOnly": "npm run lint && npm run build"
     },
-    "description": "Homebridge Homekit Proxy (Based on homebridge-homekit-controller by MartinPham)",
+    "description": "Homebridge Homekit Proxy allows you to control HomeKit-enabled Devices directly from within HomeBridege. (Based on homebridge-homekit-controller by MartinPham)",
     "author": "F. Bauer",
     "license": "MIT",
     "bugs": {
