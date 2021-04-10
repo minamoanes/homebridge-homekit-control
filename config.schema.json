@@ -1,5 +1,5 @@
 {
-    "pluginAlias": "HomeKitController",
+    "pluginAlias": "HomeKitProxy",
     "pluginType": "platform",
     "singular": true,
     "schema": {
