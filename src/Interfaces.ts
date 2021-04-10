@@ -11,9 +11,10 @@ export interface PairingData {
 }
 
 export interface HKServiceConfig {
-    uniquePrefix: string | undefined
-    historyInterval: number
-    name: string | undefined
+    uniquePrefix?: string
+    enableHistory?: boolean
+    historyInterval?: number
+    name?: string
     id: string
     address: string
     port: number
