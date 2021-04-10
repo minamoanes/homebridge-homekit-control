@@ -163,8 +163,12 @@ export class HKClient implements IHKClient {
             }
         })
 
-        if (serviceConfig.historyInterval > 0) {
-            this.fakeGato.interval = Math.max(30, Math.min(600, serviceConfig.historyInterval))
+        if (serviceConfig.enableHistory) {
+            if (serviceConfig.historyInterval) {
+                this.fakeGato.interval = Math.max(30, Math.min(600, serviceConfig.historyInterval))
+            } else {
+                this.fakeGato.interval = 600
+            }
         }
     }
 

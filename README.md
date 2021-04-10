@@ -67,8 +67,8 @@ node cli.js wlan0
 
 
 ## Config
-
-- `services.historyInterval` (*numeric*): **0** will disable fakeGato, any other positive value (in seconds) will enable the fakeGato-Service for compatible Sensors. This will allow you to view a history in the Eve-App. The valus range is **[30, 600]**.
+- `services.historyInterval` (*boolean*): **true** will enable fakeGato for compatible Sensors. This will allow you to view a history in the EVE-App
+- `services.historyInterval` (optional, *numeric*): Determins the Interval used to take readings. The valus range is **[30, 600]**. The default value is **600**
 - `services.uniquePrefix`(optional, *string*): When a device is added to multiple HomeBridge instances in the same network, you will need to provide a unique prefix. Otherwise Eve-App will get confused.
 
 ### Example
