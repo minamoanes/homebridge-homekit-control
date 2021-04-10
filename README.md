@@ -31,19 +31,19 @@ sudo npm install -g homebridge-homekit-proxy@beta
 
 ## Discover Devices
 ```
-homekit [network interface]
+homekitPair [network interface]
 ```
 
 ### Example
 
 ```
-homekit
+homekitPair
 ```
 
 or
 
 ```
-homekit wlan0
+homekitPair wlan0
 ```
 
 - Select device, and enter code to pair (including `-`, example `123-45-678`)
@@ -77,7 +77,7 @@ homekit wlan0
 This Plugin supports the Configuration Interface in Homebridge UI (homebridge-config-ui-x). Simply add a new Device and paste the values you obtained above.
 
 Here are some additional configuration parameters, not obtained by the Device Pairing:
-- `services.historyInterval` (*boolean*): **true** will enable fakeGato for compatible Sensors. This will allow you to view a history in the EVE-App
+- `services.enableHistory` (*boolean*): **true** will enable fakeGato for compatible Sensors. This will allow you to view a history in the EVE-App
 - `services.historyInterval` (optional, *numeric*): Determins the Interval used to take readings. The valus range is **[30, 600]**. The default value is **600**
 - `services.uniquePrefix`(optional, *string*): When a device is added to multiple HomeBridge instances in the same network, you will need to provide a unique prefix. Otherwise Eve-App will get confused.
 
@@ -93,7 +93,7 @@ Here are some additional configuration parameters, not obtained by the Device Pa
                     "name": "device name",
                     "address": "device ip",
                     "port": "device port",
-                    "historyInterval": 0
+                    "enableHistory": false,
                     "pairingData": {
                         "AccessoryPairingID": "xxx",
                         "AccessoryLTPK": "xxx",

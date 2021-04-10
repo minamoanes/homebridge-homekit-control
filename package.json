@@ -6,7 +6,7 @@
     },
     "version": "0.1.4-beta.0",
     "bin": {
-        "homekit": "./cli.js"
+        "homekitPair": "./cli.js"
     },
     "main": "dist/index.js",
     "scripts": {
