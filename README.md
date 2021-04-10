@@ -16,7 +16,7 @@ BLE is currently not supported, as it seems to be unstable when multiple BLE-ena
 All supported sensors on any configured device are automatically dicovered and added when HomeBridge starts up.
 # Install
 ```
-npm i -g homebridge-homekit-controller
+npm i -g homebridge-homekit-proxy
 
 ```
 
@@ -76,7 +76,7 @@ node cli.js wlan0
 {
     "platforms": [
         {
-            "platform": "HomeKitController",            
+            "platform": "HomeKitProxy",            
             "services": [
                 {
                     "id": "device id",

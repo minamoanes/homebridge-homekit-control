@@ -1,8 +1,8 @@
 {
-    "name": "homebridge-homekit-controller",
+    "name": "homebridge-homekit-proxy",
     "repository": {
         "type": "git",
-        "url": "git+ssh://git@github.com:quiqueck/homebridge-homekit-controller.git"
+        "url": "git+ssh://git@github.com:quiqueck/homebridge-homekit-proxy.git"
     },
     "version": "0.1.0",
     "bin": {
@@ -20,9 +20,9 @@
     "author": "F. Bauer",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/quiqueck/homebridge-homekit-controller/issues"
+        "url": "https://github.com/quiqueck/homebridge-homekit-proxy/issues"
     },
-    "homepage": "https://github.com/quiqueck/homebridge-homekit-controller#readme",
+    "homepage": "https://github.com/quiqueck/homebridge-homekit-proxy#readme",
     "keywords": [
         "homebridge-plugin",
         "homebridge",
