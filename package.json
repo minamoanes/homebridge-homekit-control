@@ -4,14 +4,16 @@
         "type": "git",
         "url": "git+ssh://git@github.com:quiqueck/homebridge-homekit-controller.git"
     },
-    "version": "0.0.5",
+    "version": "0.1.0",
     "bin": {
         "homekit": "./cli.js"
     },
+    "main": "dist/index.js",
     "scripts": {
-        "dev": "nodemon",
-        "build": "tsc -p tsconfig.json",
-        "prepublish": "npm run build"
+        "lint": "eslint src/**.ts --max-warnings=0",
+        "dev": "npm run build && npm link && nodemon",
+        "build": "rimraf ./dist && tsc",
+        "prepublishOnly": "npm run lint && npm run build"
     },
     "description": "Homebridge Homekit Proxy (Based on homebridge-homekit-controller by MartinPham)",
     "author": "F. Bauer ",
@@ -52,7 +54,8 @@
         "homebridge": "^1.3.4",
         "nodemon": "^2.0.7",
         "prettier": "^2.2.1",
+        "rimraf": "^3.0.2",
         "ts-node": "^9.1.1",
-        "typescript": "^4.1.3"
+        "typescript": "^4.2.4"
     }
 }
