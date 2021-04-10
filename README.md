@@ -16,8 +16,13 @@ BLE is currently not supported, as it seems to be unstable when multiple BLE-ena
 All supported sensors on any configured device are automatically dicovered and added when HomeBridge starts up.
 # Install
 ```
-npm i -g homebridge-homekit-proxy
+sudo npm i -g homebridge-homekit-proxy
 
+```
+
+or if you'd like to run the beta versions, you can use
+```
+sudo npm install -g homebridge-homekit-proxy@beta
 ```
 
 # Pair devices

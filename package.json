@@ -14,6 +14,7 @@
         "dev": "npm run build && npm link && nodemon",
         "build": "rimraf ./dist && tsc",
         "local": "npm run build && npm link",
+        "gobeta": "npm version prepatch --preid beta && npm publish --tag=beta",
         "prepublishOnly": "npm run lint && npm run build"
     },
     "description": "Homebridge Homekit Proxy (Based on homebridge-homekit-controller by MartinPham)",
