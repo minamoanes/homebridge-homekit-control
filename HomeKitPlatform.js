@@ -133,12 +133,7 @@ class HKClient {
 
         const self = this
 
-        const client = new HttpClient(
-            serviceConfig.id,
-            serviceConfig.address,
-            serviceConfig.port,
-            serviceConfig.pairingData
-        )
+        const client = this.con()
         this.mainClient = client
         
 
@@ -231,9 +226,13 @@ class HKClient {
             }
         ).then((data) => {
             c.value = data.characteristics[0].value
-            this.parent.log.debug('Received Value', c.cname, c.value)
-            
+            this.parent.log.debug('Received Value', c.cname, c.value)            
             char.updateValue(c.value)                                
+
+            if (char.chain){
+                this.parent.log.debug(` ==> Chain received value from ${c.cname} to ${char.chain.displayName} (Value=${char.chainValue()})`)
+                char.chain.updateValue(char.chainValue())
+            }
         }).catch((e) => this.parent.log.error('get', c.cname, e))
     }
 
@@ -267,9 +266,6 @@ class HKClient {
             const char = service.getCharacteristic(c.create)
             c.connect = char
             self.copyProps(c.source, char)
-
-            
-            
             
             if (c.source.perms && c.source.perms.indexOf('pr')>=0){                                                
                 char.on('get', (callback) => {                    
@@ -295,7 +291,12 @@ class HKClient {
                             this.parent.log.debug(`Got Event for ${c.cname}. Changed value ${c.value} => ${data.value}`)
 
                             c.value = data.value
-                            char.updateValue(data.value)                                
+                            char.updateValue(data.value)  
+                            
+                            if (char.chain){
+                                this.parent.log.debug(` ==> Chain event from ${c.cname} to ${char.chain.displayName} (Value=${char.chainValue()})`)
+                                char.chain.updateValue(char.chainValue())
+                            }
                         }
                     }
                 })
@@ -427,7 +428,8 @@ class HKClient {
                         airQualityC.updateValue(valueGetter())
                     }
 
-                    airQualityC.onGet(async ()=> valueGetter())
+                    h.data.ppm.connect.chain = airQualityC
+                    h.data.ppm.connect.chainValue = valueGetter                    
                 }
                 
                 h.logService = accessory.getService(FakeGatoService)
