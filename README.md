@@ -31,19 +31,19 @@ sudo npm install -g homebridge-homekit-proxy@beta
 
 ## Discover Devices
 ```
-node cli.js [network interface]
+homekit [network interface]
 ```
 
 ### Example
 
 ```
-node cli.js
+homekit
 ```
 
 or
 
 ```
-node cli.js wlan0
+homekit wlan0
 ```
 
 - Select device, and enter code to pair (including `-`, example `123-45-678`)
