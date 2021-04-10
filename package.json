@@ -13,10 +13,11 @@
         "lint": "eslint src/**.ts --max-warnings=0",
         "dev": "npm run build && npm link && nodemon",
         "build": "rimraf ./dist && tsc",
+        "local": "npm run build && npm link",
         "prepublishOnly": "npm run lint && npm run build"
     },
     "description": "Homebridge Homekit Proxy (Based on homebridge-homekit-controller by MartinPham)",
-    "author": "F. Bauer ",
+    "author": "F. Bauer",
     "license": "ISC",
     "bugs": {
         "url": "https://github.com/quiqueck/homebridge-homekit-controller/issues"
