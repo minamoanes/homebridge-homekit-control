@@ -120,6 +120,7 @@ export function classFromID(list: (ServiceItem | CharacteristicItem)[], id: stri
     return undefined
 }
 
+//as defined here: https://github.com/simont77/fakegato-history/wiki/Services-and-characteristics-for-Elgato-Eve-devices
 function _buildEveAirQuality(api: API): WithUUID<new () => Characteristic> {
     const EveAirQuality = function (this: any) {
         const self: any = this
