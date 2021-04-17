@@ -163,6 +163,7 @@ export class HttpWrapper {
         const self = this
         return self.list.push(
             () => {
+                this.log.debug('Running Subscribe task', characteristics.join(', '))
                 return self.client.subscribeCharacteristics(characteristics)
             },
             'subscribeCharacteristics',
