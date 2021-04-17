@@ -109,50 +109,8 @@ export class HKClient implements IHKClient {
             .getAccessories()
             .then((inData: any) => {
                 //looks like this Gatt-Result is the actual return type for httpClient as well
-                const data = inData as Accessories
-
+                self._loadDevices(inData as Accessories)
                 self.accesoriesWereLoaded = true
-                this.supportedAccessories = data.accessories.map((acc: HttpClientAccesory) => {
-                    const aRes: AcceessoryDescription = {
-                        fakeGato: {
-                            room: {},
-                            motion: {},
-                            history: [],
-                        },
-                        services: acc.services.map((s: HttpClientService) => {
-                            const sRes: ServiceDescription = {
-                                create: this.parent.supported.classForService(s.type),
-                                uname: `${this.uuid}.${acc.aid}.${s.iid}`,
-                                characteristics: s.characteristics
-                                    .map((c: HttpClientCharacteristic) => {
-                                        const cRes: CharacteristicDescription = {
-                                            create: this.parent.supported.classForChar(c.type),
-                                            uname: `${this.uuid}.${acc.aid}.${s.iid}.${c.iid}`,
-                                            cname: `${acc.aid}.${c.iid}`,
-                                            value: c.value,
-                                            source: c,
-                                            connect: undefined,
-                                            allowValueUpdates: true,
-                                        }
-                                        return cRes
-                                    })
-                                    .filter((c) => {
-                                        if (c.create === undefined) {
-                                            this.parent.log.warn(`${this.name}: Missing Chracteristic in ${s.type} with type ${c.source.type}`)
-                                            if (this.serviceConfig.logFoundServices) {
-                                                this.parent.log.warn(JSON.stringify(c.source, null, 4))
-                                            }
-                                            return false
-                                        }
-                                        return true
-                                    }),
-                                source: s,
-                            }
-                            return sRes
-                        }),
-                    }
-                    return aRes
-                })
 
                 if (this.serviceConfig.logFoundServices) {
                     this.logSourceServices()
@@ -182,6 +140,50 @@ export class HKClient implements IHKClient {
                 this.fakeGato.interval = 600
             }
         }
+    }
+
+    _loadDevices(data: Accessories) {
+        this.supportedAccessories = data.accessories.map((acc: HttpClientAccesory) => {
+            const aRes: AcceessoryDescription = {
+                fakeGato: {
+                    room: {},
+                    motion: {},
+                    history: [],
+                },
+                services: acc.services.map((s: HttpClientService) => {
+                    const sRes: ServiceDescription = {
+                        create: this.parent.supported.classForService(s.type),
+                        uname: `${this.uuid}.${acc.aid}.${s.iid}`,
+                        characteristics: s.characteristics
+                            .map((c: HttpClientCharacteristic) => {
+                                const cRes: CharacteristicDescription = {
+                                    create: this.parent.supported.classForChar(c.type),
+                                    uname: `${this.uuid}.${acc.aid}.${s.iid}.${c.iid}`,
+                                    cname: `${acc.aid}.${c.iid}`,
+                                    value: c.value,
+                                    source: c,
+                                    connect: undefined,
+                                    allowValueUpdates: true,
+                                }
+                                return cRes
+                            })
+                            .filter((c) => {
+                                if (c.create === undefined) {
+                                    this.parent.log.warn(`${this.name}: Missing Chracteristic in ${s.type} with type ${c.source.type}`)
+                                    if (this.serviceConfig.logFoundServices) {
+                                        this.parent.log.warn(JSON.stringify(c.source, null, 4))
+                                    }
+                                    return false
+                                }
+                                return true
+                            }),
+                        source: s,
+                    }
+                    return sRes
+                }),
+            }
+            return aRes
+        })
     }
 
     logSourceServices() {
@@ -227,13 +229,16 @@ export class HKClient implements IHKClient {
             return
         }
         if (this.getQueWaiting) {
-            this.parent.log.debug(this.name, 'defering read from', char.displayName)
+            this.parent.log.debug(`${this.name} - defer read ${char.displayName} (${c.cname})`)
+
             this.getQueue = this.getQueue.filter((item) => item.char != char)
             this.getQueue.push({ char: char, value: 0, c: c })
             return
         }
         this.getQueWaiting = true
         const self = this
+        self.parent.log.debug(`${self.name} - send get ${char.displayName} (${c.cname})`)
+
         this.con()
             .getCharacteristics([c.cname], {
                 meta: true,
@@ -243,12 +248,13 @@ export class HKClient implements IHKClient {
             })
             .then((inData: any) => {
                 const data = inData as HttpClientService
+                const old = c.value
                 c.value = data.characteristics[0].value
-                this.parent.log.debug(this.name, 'Received Value', c.cname, char.displayName, c.value)
+                self.parent.log.info(`${self.name} - received ${char.displayName}=${c.value} (was ${old}, ${c.cname})`)
                 char.updateValue(c.value)
 
                 if (char.chain && char.chainValue) {
-                    this.parent.log.debug(` ==> Chain received value from ${c.cname} to ${char.chain.displayName} (Value=${char.chainValue()})`)
+                    this.parent.log.debug(` ==> Chain received value from ${char.displayName} to ${char.chain.displayName} (Value=${char.chainValue()})`)
                     char.chain.updateValue(char.chainValue())
                 }
 
@@ -258,7 +264,7 @@ export class HKClient implements IHKClient {
                     setTimeout(() => self._updateCharacteristicValue(qi!.char, qi!.c), 200)
                 }
             })
-            .catch((e) => this.parent.log.error('get', c.cname, e))
+            .catch((e) => self.parent.log.info(`${self.name} - get error ${char.displayName}=${c.value} (${c.cname}, ${e})`))
     }
 
     private setQueue: SetCharQueue[] = []
@@ -266,7 +272,8 @@ export class HKClient implements IHKClient {
 
     private _setCharacteristicValue(char: ExtendedCharacteristic, value: any, c: CharacteristicDescription) {
         if (this.setQueWaiting) {
-            this.parent.log.debug(this.name, 'defering value to', char.displayName, value)
+            this.parent.log.debug(`${this.name} - defer write ${char.displayName}=${value} (${c.cname})`)
+
             this.setQueue = this.setQueue.filter((item) => item.char != char)
             this.setQueue.push({ char: char, value: value, c: c })
             return
@@ -275,19 +282,19 @@ export class HKClient implements IHKClient {
         const data = {}
         const self = this
         data[c.cname] = value
-        this.parent.log.debug(this.name, 'returning value to', char.displayName, value)
+        self.parent.log.debug(`${self.name} - send set ${char.displayName}=${c.value} (${c.cname})`)
         this.con()
             .setCharacteristics(data)
             .then(() => {
                 c.value = value
-                self.parent.log.info(self.name, 'Wrote Value', c.cname, char.displayName, c.value)
+                self.parent.log.info(`${self.name} - wrote ${char.displayName}=${c.value} (${c.cname})`)
                 self.setQueWaiting = false
                 if (self.setQueue.length > 0) {
                     const qi = self.setQueue.shift()
                     setTimeout(() => self._setCharacteristicValue(qi!.char, qi!.value, qi!.c), 200)
                 }
             })
-            .catch((e) => this.parent.log.error(this.name, 'set', c.cname, e))
+            .catch((e) => self.parent.log.error(`${self.name} - set failed ${char.displayName}=${c.value} (${c.cname}, ${e})`))
     }
 
     private initAccessoryService(sData: ServiceDescription, service: Service) {
