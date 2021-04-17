@@ -12,15 +12,10 @@ import {
     IHKPlatform,
     ServiceDescription,
 } from './Interfaces'
-import { HttpClient } from 'hap-controller'
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings'
 import { Accessories } from 'hap-controller/lib/transport/ble/gatt-client'
+import { HttpWrapper } from './HttpWrapper'
 
-interface SetCharQueue {
-    char: ExtendedCharacteristic
-    value: any
-    c: CharacteristicDescription
-}
 interface FakeGatoData {
     interval: number
     timer: NodeJS.Timer | undefined
@@ -84,6 +79,7 @@ export class HKClient implements IHKClient {
 
     private supportedAccessories: AcceessoryDescription[]
     private readonly fakeGato: FakeGatoData
+    private readonly client: HttpWrapper
     constructor(serviceConfig: HKServiceConfig, parent: IHKPlatform) {
         this.parent = parent
         this.serviceConfig = serviceConfig
@@ -105,7 +101,8 @@ export class HKClient implements IHKClient {
 
         const self = this
 
-        this.con()
+        this.client = new HttpWrapper(this.parent.log, this.serviceConfig.id, this.serviceConfig.address, this.serviceConfig.port, this.serviceConfig.pairingData)
+        this.client
             .getAccessories()
             .then((inData: any) => {
                 //looks like this Gatt-Result is the actual return type for httpClient as well
@@ -218,24 +215,15 @@ export class HKClient implements IHKClient {
         )
     }
 
-    con(): HttpClient {
-        return new HttpClient(this.serviceConfig.id, this.serviceConfig.address, this.serviceConfig.port, this.serviceConfig.pairingData)
+    con(): HttpWrapper {
+        return this.client
     }
 
-    private getQueue: SetCharQueue[] = []
-    private getQueWaiting = false
     private _updateCharacteristicValue(char: ExtendedCharacteristic, c: CharacteristicDescription) {
         if (!c.allowValueUpdates) {
             return
         }
-        if (this.getQueWaiting) {
-            this.parent.log.debug(`${this.name} - defer read ${char.displayName} (${c.cname})`)
 
-            this.getQueue = this.getQueue.filter((item) => item.char != char)
-            this.getQueue.push({ char: char, value: 0, c: c })
-            return
-        }
-        this.getQueWaiting = true
         const self = this
         self.parent.log.debug(`${self.name} - send get ${char.displayName} (${c.cname})`)
 
@@ -250,51 +238,34 @@ export class HKClient implements IHKClient {
                 const data = inData as HttpClientService
                 const old = c.value
                 c.value = data.characteristics[0].value
-                self.parent.log.info(`${self.name} - received ${char.displayName}=${c.value} (was ${old}, ${c.cname})`)
+                self.parent.log.debug(`${self.name} - received ${char.displayName}=${c.value} (was ${old}, ${c.cname})`)
                 char.updateValue(c.value)
 
                 if (char.chain && char.chainValue) {
                     this.parent.log.debug(` ==> Chain received value from ${char.displayName} to ${char.chain.displayName} (Value=${char.chainValue()})`)
                     char.chain.updateValue(char.chainValue())
                 }
-
-                self.getQueWaiting = false
-                if (self.getQueue.length > 0) {
-                    const qi = self.getQueue.shift()
-                    setTimeout(() => self._updateCharacteristicValue(qi!.char, qi!.c), 200)
-                }
             })
-            .catch((e) => self.parent.log.info(`${self.name} - get error ${char.displayName}=${c.value} (${c.cname}, ${e})`))
+            .catch((e) => {
+                self.parent.log.error(`${self.name} - get error ${char.displayName}=${c.value} (${c.cname}, ${e})`)
+            })
     }
 
-    private setQueue: SetCharQueue[] = []
-    private setQueWaiting = false
-
     private _setCharacteristicValue(char: ExtendedCharacteristic, value: any, c: CharacteristicDescription) {
-        if (this.setQueWaiting) {
-            this.parent.log.debug(`${this.name} - defer write ${char.displayName}=${value} (${c.cname})`)
-
-            this.setQueue = this.setQueue.filter((item) => item.char != char)
-            this.setQueue.push({ char: char, value: value, c: c })
-            return
-        }
-        this.setQueWaiting = true
         const data = {}
         const self = this
         data[c.cname] = value
         self.parent.log.debug(`${self.name} - send set ${char.displayName}=${c.value} (${c.cname})`)
+
         this.con()
             .setCharacteristics(data)
             .then(() => {
                 c.value = value
                 self.parent.log.info(`${self.name} - wrote ${char.displayName}=${c.value} (${c.cname})`)
-                self.setQueWaiting = false
-                if (self.setQueue.length > 0) {
-                    const qi = self.setQueue.shift()
-                    setTimeout(() => self._setCharacteristicValue(qi!.char, qi!.value, qi!.c), 200)
-                }
             })
-            .catch((e) => self.parent.log.error(`${self.name} - set failed ${char.displayName}=${c.value} (${c.cname}, ${e})`))
+            .catch((e) => {
+                self.parent.log.error(`${self.name} - set failed ${char.displayName}=${c.value} (${c.cname}, ${e})`)
+            })
     }
 
     private initAccessoryService(sData: ServiceDescription, service: Service) {
@@ -335,30 +306,29 @@ export class HKClient implements IHKClient {
 
                 if (c.allowValueUpdates && c.source.perms && c.source.perms.indexOf('ev') >= 0) {
                     const cl = this.con()
-                    cl.on('event', (event) => {
-                        if (event.characteristics && event.characteristics.length > 0) {
-                            const data = event.characteristics[0]
+                    cl.on(c, (data) => {
+                        if (data.value) {
+                            this.parent.log.debug(`${this.name} - Got Event for ${char.displayName} (${c.cname}). Changed value ${c.value} => ${data.value}`)
 
-                            if (c.cname === `${data.aid}.${data.iid}` && data.value) {
-                                this.parent.log.debug(`Got Event for ${c.cname}. Changed value ${c.value} => ${data.value}`)
+                            c.value = data.value
+                            char.updateValue(data.value)
 
-                                c.value = data.value
-                                char.updateValue(data.value)
-
-                                if (char.chain && char.chainValue) {
-                                    this.parent.log.debug(` ==> Chain event from ${c.cname} to ${char.chain.displayName} (Value=${char.chainValue()})`)
-                                    char.chain.updateValue(char.chainValue())
-                                }
+                            if (char.chain && char.chainValue) {
+                                this.parent.log.debug(` ==> Chain event from ${char.displayName} to ${char.chain.displayName} (Value=${char.chainValue()})`)
+                                char.chain.updateValue(char.chainValue())
                             }
                         }
                     })
 
+                    this.parent.log.debug(`${char.displayName} (${c.cname}) Has Events, trying to subscribe`)
                     cl.subscribeCharacteristics([c.cname])
                         .then((conn) => {
-                            this.parent.log.debug(c.cname, 'Subscribed to events')
+                            this.parent.log.debug(`${this.name}, ${char.displayName} (${c.cname}) Subscribed to Events`)
                             c.connection = conn
                         })
-                        .catch((e) => console.error(e))
+                        .catch((e) => {
+                            this.parent.log.error(`${char.displayName} failed to Subscribe`, e)
+                        })
                 }
             } else {
                 this.parent.log.warn(`Unable to create Characteristic ${c.uname} of type ${c.source.type}`)
