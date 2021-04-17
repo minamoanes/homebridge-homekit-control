@@ -127,8 +127,8 @@ function _buildEveAirQuality(api: API): WithUUID<new () => Characteristic> {
         api.hap.Characteristic.call(self, 'Air Quality PM25', 'E863F10B-079E-48FF-8F27-9C2605A29F52', {
             format: Formats.UINT16,
             unit: 'ppm',
-            maxValue: 99999,
-            minValue: 500,
+            maxValue: 65535,
+            minValue: 450,
             minStep: 1,
             perms: [Perms.PAIRED_READ, Perms.NOTIFY],
         })
@@ -159,7 +159,7 @@ export class SupportedServices {
         //         super('Air Quality PM25', EveAirQuality.UUID, {
         //             format: Formats.UINT16,
         //             perms: [Perms.NOTIFY, Perms.PAIRED_READ],
-        //             maxValue: 99999,
+        //             maxValue: 65535,
         //             minValue: 500,
         //             minStep: 1,
         //         })
