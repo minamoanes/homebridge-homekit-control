@@ -126,7 +126,8 @@ Using `npm run dev` will launch the develop environment, where your code is auto
 The command `npm rund build` will trigger the compilation of your project manually.
 
 ## Tested Accesories
-
+(!!! Use at your own risk !!!)
 - Quingping Air Monitor Lite (Cleargrass Luftdetektor Lite, Cleargrass Air Monitor Lite)
-
+- Nanoleaf Aurora / Light Panels
+  
 Please let me know if you use this plugin and got it to work with a new HomeKit-Accesory that is not listed above
