@@ -1,4 +1,4 @@
-import { Characteristic, Service, API, WithUUID, Perms, Formats } from 'homebridge'
+import { Characteristic, Service, API, WithUUID, Perms, Formats, CharacteristicProps } from 'homebridge'
 import { inherits } from 'util'
 import fakegato from 'fakegato-history'
 
@@ -117,79 +117,59 @@ export function classFromID(list: (ServiceItem | CharacteristicItem)[], id: stri
     return undefined
 }
 
-//as defined here: https://github.com/simont77/fakegato-history/wiki/Services-and-characteristics-for-Elgato-Eve-devices
-function _buildEveAirQuality(api: API): WithUUID<new () => Characteristic> {
-    const EveAirQuality = function (this: any) {
+function generateCharacteristic(api: API, name: string, UUID: string, perms: CharacteristicProps) {
+    const NewCharacteristic = function (this: any) {
         const self: any = this
-        api.hap.Characteristic.call(self, 'Air Quality PM25', 'E863F10B-079E-48FF-8F27-9C2605A29F52', {
-            format: Formats.UINT16,
-            unit: 'ppm',
-            maxValue: 65535,
-            minValue: 450,
-            minStep: 1,
-            perms: [Perms.PAIRED_READ, Perms.NOTIFY],
-        })
+        api.hap.Characteristic.call(self, name, UUID, perms)
         self.value = self.getDefaultValue()
     }
-    EveAirQuality.UUID = 'E863F10B-079E-48FF-8F27-9C2605A29F52'
-    EveAirQuality.uuid = 'E863F10B-079E-48FF-8F27-9C2605A29F52'
+    NewCharacteristic.UUID = UUID
+    NewCharacteristic.uuid = UUID
 
-    inherits(EveAirQuality, api.hap.Characteristic)
+    inherits(NewCharacteristic, api.hap.Characteristic)
 
-    return EveAirQuality as any
+    return NewCharacteristic as any
 }
 
-//A18E7901-CFA1-4D37-A10F-0071CEEEEEBD
-function _buildLayoutDetectionService(api: API): WithUUID<new () => Service> {
-    const LayoutDetectionService = function (this: any) {
+function generateService(api: API, name: string, UUID: string) {
+    const NewService = function (this: any) {
         const self: any = this
-        api.hap.Service.call(this, 'Layout Detection Service', 'A18E7901-CFA1-4D37-A10F-0071CEEEEEBD')
+        api.hap.Service.call(self, name, UUID)
     }
-    LayoutDetectionService.UUID = 'A18E7901-CFA1-4D37-A10F-0071CEEEEEBD'
-    LayoutDetectionService.uuid = 'A18E7901-CFA1-4D37-A10F-0071CEEEEEBD'
+    NewService.UUID = UUID
+    NewService.uuid = UUID
 
-    inherits(LayoutDetectionService, api.hap.Service)
+    inherits(NewService, api.hap.Service)
 
-    return LayoutDetectionService as any
+    return NewService as any
+}
+
+//as defined here: https://github.com/simont77/fakegato-history/wiki/Services-and-characteristics-for-Elgato-Eve-devices
+function _buildEveAirQuality(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Air Quality PM25', 'E863F10B-079E-48FF-8F27-9C2605A29F52', {
+        format: Formats.UINT16,
+        unit: 'ppm',
+        maxValue: 65535,
+        minValue: 450,
+        minStep: 1,
+        perms: [Perms.PAIRED_READ, Perms.NOTIFY],
+    })
+}
+
+function _buildLayoutDetectionService(api: API): WithUUID<new () => Service> {
+    return generateService(api, 'Layout Detection Service', 'A18E7901-CFA1-4D37-A10F-0071CEEEEEBD')
 }
 
 function _buildAnimationService(api: API): WithUUID<new () => Service> {
-    const AnimationService = function (this: any) {
-        const self: any = this
-        api.hap.Service.call(self, 'Animation Service', 'A18E6901-CFA1-4D37-A10F-0071CEEEEEBD')
-    }
-    AnimationService.UUID = 'A18E6901-CFA1-4D37-A10F-0071CEEEEEBD'
-    AnimationService.uuid = 'A18E6901-CFA1-4D37-A10F-0071CEEEEEBD'
-
-    inherits(AnimationService, api.hap.Service)
-
-    return AnimationService as any
+    return generateService(api, 'Animation Service', 'A18E6901-CFA1-4D37-A10F-0071CEEEEEBD')
 }
 
 function _buildFirmwareUpdateService(api: API): WithUUID<new () => Service> {
-    const FirmwareService = function (this: any) {
-        const self: any = this
-        api.hap.Service.call(self, 'Firmware Update Service', 'A18E1901-CFA1-4D37-A10F-0071CEEEEEBD')
-    }
-    FirmwareService.UUID = 'A18E1901-CFA1-4D37-A10F-0071CEEEEEBD'
-    FirmwareService.uuid = 'A18E1901-CFA1-4D37-A10F-0071CEEEEEBD'
-
-    inherits(FirmwareService, api.hap.Service)
-
-    return FirmwareService as any
+    return generateService(api, 'Firmware Update Service', 'A18E1901-CFA1-4D37-A10F-0071CEEEEEBD')
 }
 
 function _buildCloudSyncService(api: API): WithUUID<new () => Service> {
-    const CloudSyncService = function (this: any) {
-        const self: any = this
-        api.hap.Service.call(self, 'Cloud Sync', 'A18EB901-CFA1-4D37-A10F-0071CEEEEEBD')
-    }
-    CloudSyncService.UUID = 'A18EB901-CFA1-4D37-A10F-0071CEEEEEBD'
-    CloudSyncService.uuid = 'A18EB901-CFA1-4D37-A10F-0071CEEEEEBD'
-
-    inherits(CloudSyncService, api.hap.Service)
-
-    return CloudSyncService as any
+    return generateService(api, 'Cloud Sync', 'A18EB901-CFA1-4D37-A10F-0071CEEEEEBD')
 }
 export class SupportedServices {
     private _KnownServiceMap: ServiceItem[]
