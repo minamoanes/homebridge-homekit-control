@@ -2,7 +2,7 @@ import { Characteristic, Service, API, WithUUID, Perms, Formats } from 'homebrid
 import { inherits } from 'util'
 import fakegato from 'fakegato-history'
 
-export function listKnownServices(api: API): WithUUID<new () => Service>[] {
+export function listKnownServices(api: API, parent: SupportedServices): WithUUID<new () => Service>[] {
     return [
         api.hap.Service.HumiditySensor,
         api.hap.Service.TemperatureSensor,
@@ -18,6 +18,10 @@ export function listKnownServices(api: API): WithUUID<new () => Service>[] {
         api.hap.Service.Lightbulb,
         api.hap.Service.Outlet,
         api.hap.Service.LightSensor,
+        parent.LayoutDetectionService,
+        parent.AnimationService,
+        parent.FirmwareUpdateService,
+        parent.CloudSyncService,
     ]
 }
 export function listKnownCharacteristics(api: API): WithUUID<new () => Characteristic>[] {
@@ -105,13 +109,6 @@ function mapShort(list: (WithUUID<new () => Characteristic> | WithUUID<new () =>
     return res
 }
 
-export function initKnownDevices(api: API) {
-    return {
-        KnownServiceMap: mapShort(listKnownServices(api)) as ServiceItem[],
-        KnownCharMap: mapShort(listKnownCharacteristics(api)) as CharacteristicItem[],
-    }
-}
-
 export function classFromID(list: (ServiceItem | CharacteristicItem)[], id: string) {
     const result = list.find((item) => item.id === id)
     if (result) {
@@ -142,14 +139,78 @@ function _buildEveAirQuality(api: API): WithUUID<new () => Characteristic> {
     return EveAirQuality as any
 }
 
+//A18E7901-CFA1-4D37-A10F-0071CEEEEEBD
+function _buildLayoutDetectionService(api: API): WithUUID<new () => Service> {
+    const LayoutDetectionService = function (this: any) {
+        const self: any = this
+        api.hap.Service.call(this, 'Layout Detection Service', 'A18E7901-CFA1-4D37-A10F-0071CEEEEEBD')
+    }
+    LayoutDetectionService.UUID = 'A18E7901-CFA1-4D37-A10F-0071CEEEEEBD'
+    LayoutDetectionService.uuid = 'A18E7901-CFA1-4D37-A10F-0071CEEEEEBD'
+
+    inherits(LayoutDetectionService, api.hap.Service)
+
+    return LayoutDetectionService as any
+}
+
+function _buildAnimationService(api: API): WithUUID<new () => Service> {
+    const AnimationService = function (this: any) {
+        const self: any = this
+        api.hap.Service.call(self, 'Animation Service', 'A18E6901-CFA1-4D37-A10F-0071CEEEEEBD')
+    }
+    AnimationService.UUID = 'A18E6901-CFA1-4D37-A10F-0071CEEEEEBD'
+    AnimationService.uuid = 'A18E6901-CFA1-4D37-A10F-0071CEEEEEBD'
+
+    inherits(AnimationService, api.hap.Service)
+
+    return AnimationService as any
+}
+
+function _buildFirmwareUpdateService(api: API): WithUUID<new () => Service> {
+    const FirmwareService = function (this: any) {
+        const self: any = this
+        api.hap.Service.call(self, 'Firmware Update Service', 'A18E1901-CFA1-4D37-A10F-0071CEEEEEBD')
+    }
+    FirmwareService.UUID = 'A18E1901-CFA1-4D37-A10F-0071CEEEEEBD'
+    FirmwareService.uuid = 'A18E1901-CFA1-4D37-A10F-0071CEEEEEBD'
+
+    inherits(FirmwareService, api.hap.Service)
+
+    return FirmwareService as any
+}
+
+function _buildCloudSyncService(api: API): WithUUID<new () => Service> {
+    const CloudSyncService = function (this: any) {
+        const self: any = this
+        api.hap.Service.call(self, 'Cloud Sync', 'A18EB901-CFA1-4D37-A10F-0071CEEEEEBD')
+    }
+    CloudSyncService.UUID = 'A18EB901-CFA1-4D37-A10F-0071CEEEEEBD'
+    CloudSyncService.uuid = 'A18EB901-CFA1-4D37-A10F-0071CEEEEEBD'
+
+    inherits(CloudSyncService, api.hap.Service)
+
+    return CloudSyncService as any
+}
 export class SupportedServices {
     private _KnownServiceMap: ServiceItem[]
     private _KnownCharMap: CharacteristicItem[]
     public readonly EveAirQuality: WithUUID<new () => Characteristic>
     public readonly FakeGatoService: WithUUID<new () => Service>
+    public readonly LayoutDetectionService: WithUUID<new () => Service>
+    public readonly AnimationService: WithUUID<new () => Service>
+    public readonly FirmwareUpdateService: WithUUID<new () => Service>
+    public readonly CloudSyncService: WithUUID<new () => Service>
 
     constructor(api: API) {
-        this._KnownServiceMap = mapShort(listKnownServices(api)) as ServiceItem[]
+        this.EveAirQuality = _buildEveAirQuality(api)
+        this.FakeGatoService = fakegato(api)
+
+        this.LayoutDetectionService = _buildLayoutDetectionService(api)
+        this.AnimationService = _buildAnimationService(api)
+        this.FirmwareUpdateService = _buildFirmwareUpdateService(api)
+        this.CloudSyncService = _buildCloudSyncService(api)
+
+        this._KnownServiceMap = mapShort(listKnownServices(api, this)) as ServiceItem[]
         this._KnownCharMap = mapShort(listKnownCharacteristics(api)) as CharacteristicItem[]
 
         // this.EveAirQuality = class EveAirQuality extends api.hap.Characteristic {
@@ -166,8 +227,6 @@ export class SupportedServices {
         //         this.value = this.getDefaultValue()
         //     }
         // }
-        this.EveAirQuality = _buildEveAirQuality(api)
-        this.FakeGatoService = fakegato(api)
     }
 
     get KnownServiceMap(): ServiceItem[] {
