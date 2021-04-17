@@ -24,7 +24,7 @@ export function listKnownServices(api: API, parent: SupportedServices): WithUUID
         parent.CloudSyncService,
     ]
 }
-export function listKnownCharacteristics(api: API): WithUUID<new () => Characteristic>[] {
+export function listKnownCharacteristics(api: API, parent: SupportedServices): WithUUID<new () => Characteristic>[] {
     return [
         api.hap.Characteristic.Identify,
         api.hap.Characteristic.Manufacturer,
@@ -59,6 +59,29 @@ export function listKnownCharacteristics(api: API): WithUUID<new () => Character
         api.hap.Characteristic.CurrentAmbientLightLevel,
         api.hap.Characteristic.AirParticulateDensity,
         api.hap.Characteristic.ChargingState,
+        parent.CloudHomeSync,
+        parent.CloudHomeSyncDescription,
+        parent.CloudProvisioningHashString,
+        parent.NanoleafColorTemperature,
+        parent.AnimationSelect,
+        parent.AnimationWrite,
+        parent.AnimationRead,
+        parent.AnimationList,
+        parent.AnimationPlayList,
+        parent.RythmActive,
+        parent.RythmConnected,
+        parent.RythmMode,
+        parent.RythmAuxAvailable,
+        parent.NanoleafCustomEventNotifications,
+        parent.LayoutDetectionButton,
+        parent.LayoutData,
+        parent.GlobalOrientation,
+        parent.ProductWarnings,
+        parent.NewFirmwareVersion,
+        parent.FirmwareAvailability,
+        parent.InstallFirmwareUpdate,
+        parent.SyncState,
+        parent.RestoreFromCloud,
     ]
 }
 
@@ -117,7 +140,7 @@ export function classFromID(list: (ServiceItem | CharacteristicItem)[], id: stri
     return undefined
 }
 
-function generateCharacteristic(api: API, name: string, UUID: string, perms: CharacteristicProps) {
+function generateCharacteristic(api: API, name: string, UUID: string, perms: CharacteristicProps): WithUUID<new () => Characteristic> {
     const NewCharacteristic = function (this: any) {
         const self: any = this
         api.hap.Characteristic.call(self, name, UUID, perms)
@@ -131,10 +154,14 @@ function generateCharacteristic(api: API, name: string, UUID: string, perms: Cha
     return NewCharacteristic as any
 }
 
-function generateService(api: API, name: string, UUID: string) {
+function generateService(api: API, name: string, UUID: string, optionals?: WithUUID<new () => Characteristic>[]): WithUUID<new () => Service> {
+    if (optionals === undefined) {
+        optionals = []
+    }
     const NewService = function (this: any) {
         const self: any = this
         api.hap.Service.call(self, name, UUID)
+        optionals?.forEach((o) => this.addOptionalCharacteristic(o))
     }
     NewService.UUID = UUID
     NewService.uuid = UUID
@@ -156,42 +183,281 @@ function _buildEveAirQuality(api: API): WithUUID<new () => Characteristic> {
     })
 }
 
-function _buildLayoutDetectionService(api: API): WithUUID<new () => Service> {
-    return generateService(api, 'Layout Detection Service', 'A18E7901-CFA1-4D37-A10F-0071CEEEEEBD')
+function _buildCloudProvisioningHashString(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Cloud Provisioning Hash String', 'A18E8903-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.STRING,
+        perms: [Perms.PAIRED_READ, Perms.HIDDEN],
+    })
 }
 
-function _buildAnimationService(api: API): WithUUID<new () => Service> {
-    return generateService(api, 'Animation Service', 'A18E6901-CFA1-4D37-A10F-0071CEEEEEBD')
+function _buildCloudHomeSync(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Cloud Home Sync Description', 'A18E8902-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.DATA,
+        perms: [Perms.PAIRED_READ, Perms.HIDDEN],
+    })
 }
 
-function _buildFirmwareUpdateService(api: API): WithUUID<new () => Service> {
-    return generateService(api, 'Firmware Update Service', 'A18E1901-CFA1-4D37-A10F-0071CEEEEEBD')
+function _buildCloudHomeSyncDescription(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Cloud Home Sync Description', 'A18E8902-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.DATA,
+        perms: [Perms.PAIRED_READ, Perms.HIDDEN],
+    })
 }
 
-function _buildCloudSyncService(api: API): WithUUID<new () => Service> {
-    return generateService(api, 'Cloud Sync', 'A18EB901-CFA1-4D37-A10F-0071CEEEEEBD')
+function _buildNanoleafColorTemperature(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Color Temperature', 'A18E5901-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.INT,
+        perms: [Perms.PAIRED_READ, Perms.HIDDEN, Perms.PAIRED_WRITE, Perms.NOTIFY],
+        minValue: 1200,
+        maxValue: 6500,
+        minStep: 1,
+    })
+}
+
+function _buildAnimationSelect(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Animation Select', 'A18E6902-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.STRING,
+        perms: [Perms.PAIRED_READ, Perms.HIDDEN, Perms.PAIRED_WRITE, Perms.NOTIFY],
+    })
+}
+
+function _buildAnimationWrite(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Animation Write', 'A18E6903-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.DATA,
+        perms: [Perms.PAIRED_WRITE, Perms.HIDDEN],
+    })
+}
+
+function _buildAnimationRead(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Animation Read', 'A18E6904-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.DATA,
+        perms: [Perms.PAIRED_READ, Perms.HIDDEN],
+    })
+}
+
+function _buildAnimationList(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Animation List', 'A18E6905-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.DATA,
+        perms: [Perms.PAIRED_READ, Perms.HIDDEN, Perms.NOTIFY],
+    })
+}
+
+function _buildAnimationPlayList(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Animation Playlist', 'A18E690B-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.STRING,
+        perms: [Perms.PAIRED_READ, Perms.HIDDEN, Perms.NOTIFY],
+    })
+}
+
+function _buildRythmActive(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Rhythm Active', 'A18E6907-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.BOOL,
+        perms: [Perms.PAIRED_READ, Perms.HIDDEN, Perms.NOTIFY],
+    })
+}
+
+function _buildRythmConnected(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Rhythm Connected', 'A18E6906-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.BOOL,
+        perms: [Perms.PAIRED_READ, Perms.HIDDEN, Perms.NOTIFY],
+    })
+}
+
+function _buildRythmMode(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Rhythm Mode', 'A18E6908-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.INT,
+        perms: [Perms.PAIRED_READ, Perms.HIDDEN, Perms.NOTIFY, Perms.PAIRED_WRITE],
+        maxValue: 1,
+        minValue: 0,
+        minStep: 1,
+        unit: 'int',
+    })
+}
+
+function _buildRythmAuxAvailable(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Rhythm Aux Available', 'A18E6909-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.BOOL,
+        perms: [Perms.PAIRED_READ, Perms.HIDDEN, Perms.NOTIFY],
+    })
+}
+
+function _buildNanoleafCustomEventNotifications(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Custom Event Notifications', 'A18E690A-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.DATA,
+        perms: [Perms.PAIRED_READ, Perms.HIDDEN, Perms.NOTIFY],
+    })
+}
+
+function _buildLayoutDetectionButton(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Layout Detection Button', 'A18E7902-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.BOOL,
+        perms: [Perms.PAIRED_READ, Perms.HIDDEN, Perms.PAIRED_WRITE],
+    })
+}
+function _buildLayoutData(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Layout Data', 'A18E7903-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.DATA,
+        perms: [Perms.PAIRED_READ, Perms.HIDDEN, Perms.NOTIFY],
+    })
+}
+function _buildGlobalOrientation(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Global Orientation', 'A18E7904-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.INT,
+        perms: [Perms.PAIRED_READ, Perms.HIDDEN, Perms.NOTIFY, Perms.PAIRED_WRITE],
+        maxValue: 360,
+        minValue: 0,
+        minStep: 1,
+    })
+}
+function _buildProductWarning(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Product Warnings', 'A18E7905-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.DATA,
+        perms: [Perms.PAIRED_READ, Perms.NOTIFY, Perms.HIDDEN],
+    })
+}
+
+function _buildNewFirmwareVersion(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'New Firmware Version', 'A18E1905-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.STRING,
+        perms: [Perms.PAIRED_READ, Perms.NOTIFY],
+    })
+}
+function _buildFirmwareAvailability(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Firmware Availability', 'A18E1904-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.BOOL,
+        perms: [Perms.PAIRED_READ, Perms.NOTIFY, Perms.HIDDEN],
+    })
+}
+function _buildInstallFirmwareUpdate(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Install Firmware Update', 'A18E1902-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.BOOL,
+        perms: [Perms.PAIRED_READ, Perms.HIDDEN, Perms.PAIRED_WRITE],
+    })
+}
+
+function _buildSyncState(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Sync State', 'A18EB902-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.INT,
+        perms: [Perms.PAIRED_READ, Perms.PAIRED_WRITE, Perms.PAIRED_WRITE],
+        maxValue: 2,
+        minValue: 0,
+        minStep: 1,
+    })
+}
+function _buildRestoreFromCloud(api: API): WithUUID<new () => Characteristic> {
+    return generateCharacteristic(api, 'Restore From Cloud', 'A18EB903-CFA1-4D37-A10F-0071CEEEEEBD', {
+        format: Formats.BOOL,
+        perms: [Perms.PAIRED_WRITE],
+    })
+}
+
+function _buildLayoutDetectionService(api: API, parent: SupportedServices): WithUUID<new () => Service> {
+    return generateService(api, 'Layout Detection Service', 'A18E7901-CFA1-4D37-A10F-0071CEEEEEBD', [parent.LayoutDetectionButton, parent.LayoutData, parent.GlobalOrientation, parent.ProductWarnings])
+}
+
+function _buildAnimationService(api: API, parent: SupportedServices): WithUUID<new () => Service> {
+    return generateService(api, 'Animation Service', 'A18E6901-CFA1-4D37-A10F-0071CEEEEEBD', [
+        parent.AnimationSelect,
+        parent.AnimationWrite,
+        parent.AnimationRead,
+        parent.AnimationList,
+        parent.AnimationPlayList,
+        parent.RythmActive,
+        parent.RythmConnected,
+        parent.RythmMode,
+        parent.RythmAuxAvailable,
+        parent.NanoleafCustomEventNotifications,
+    ])
+}
+
+function _buildFirmwareUpdateService(api: API, parent: SupportedServices): WithUUID<new () => Service> {
+    return generateService(api, 'Firmware Update Service', 'A18E1901-CFA1-4D37-A10F-0071CEEEEEBD', [parent.NewFirmwareVersion, parent.FirmwareAvailability, parent.InstallFirmwareUpdate])
+}
+
+function _buildCloudSyncService(api: API, parent: SupportedServices): WithUUID<new () => Service> {
+    return generateService(api, 'Cloud Sync', 'A18EB901-CFA1-4D37-A10F-0071CEEEEEBD', [parent.SyncState, parent.RestoreFromCloud])
 }
 export class SupportedServices {
     private _KnownServiceMap: ServiceItem[]
     private _KnownCharMap: CharacteristicItem[]
     public readonly EveAirQuality: WithUUID<new () => Characteristic>
     public readonly FakeGatoService: WithUUID<new () => Service>
-    public readonly LayoutDetectionService: WithUUID<new () => Service>
-    public readonly AnimationService: WithUUID<new () => Service>
-    public readonly FirmwareUpdateService: WithUUID<new () => Service>
+
+    public readonly NanoleafColorTemperature: WithUUID<new () => Characteristic>
+    public readonly NanoleafCustomEventNotifications: WithUUID<new () => Characteristic>
+
+    /* Nanoleaf Cloud Service */
     public readonly CloudSyncService: WithUUID<new () => Service>
+    public readonly CloudProvisioningHashString: WithUUID<new () => Characteristic>
+    public readonly CloudHomeSync: WithUUID<new () => Characteristic>
+    public readonly CloudHomeSyncDescription: WithUUID<new () => Characteristic>
+    public readonly SyncState: WithUUID<new () => Characteristic>
+    public readonly RestoreFromCloud: WithUUID<new () => Characteristic>
+
+    /* Nanoleaf Animation Service */
+    public readonly AnimationService: WithUUID<new () => Service>
+    public readonly AnimationSelect: WithUUID<new () => Characteristic>
+    public readonly AnimationRead: WithUUID<new () => Characteristic>
+    public readonly AnimationWrite: WithUUID<new () => Characteristic>
+    public readonly AnimationList: WithUUID<new () => Characteristic>
+    public readonly AnimationPlayList: WithUUID<new () => Characteristic>
+    public readonly RythmActive: WithUUID<new () => Characteristic>
+    public readonly RythmConnected: WithUUID<new () => Characteristic>
+    public readonly RythmMode: WithUUID<new () => Characteristic>
+    public readonly RythmAuxAvailable: WithUUID<new () => Characteristic>
+
+    /* Nanoleaf Layout Service */
+    public readonly LayoutDetectionService: WithUUID<new () => Service>
+    public readonly LayoutDetectionButton: WithUUID<new () => Characteristic>
+    public readonly LayoutData: WithUUID<new () => Characteristic>
+    public readonly GlobalOrientation: WithUUID<new () => Characteristic>
+    public readonly ProductWarnings: WithUUID<new () => Characteristic>
+
+    /* Nanoleaf Firmware Service */
+    public readonly FirmwareUpdateService: WithUUID<new () => Service>
+    public readonly NewFirmwareVersion: WithUUID<new () => Characteristic>
+    public readonly FirmwareAvailability: WithUUID<new () => Characteristic>
+    public readonly InstallFirmwareUpdate: WithUUID<new () => Characteristic>
 
     constructor(api: API) {
         this.EveAirQuality = _buildEveAirQuality(api)
         this.FakeGatoService = fakegato(api)
 
-        this.LayoutDetectionService = _buildLayoutDetectionService(api)
-        this.AnimationService = _buildAnimationService(api)
-        this.FirmwareUpdateService = _buildFirmwareUpdateService(api)
-        this.CloudSyncService = _buildCloudSyncService(api)
+        this.CloudProvisioningHashString = _buildCloudProvisioningHashString(api)
+        this.CloudHomeSyncDescription = _buildCloudHomeSyncDescription(api)
+        this.CloudHomeSync = _buildCloudHomeSync(api)
+
+        this.NanoleafColorTemperature = _buildNanoleafColorTemperature(api)
+        this.AnimationSelect = _buildAnimationSelect(api)
+        this.AnimationRead = _buildAnimationRead(api)
+        this.AnimationWrite = _buildAnimationWrite(api)
+        this.AnimationList = _buildAnimationList(api)
+        this.AnimationPlayList = _buildAnimationPlayList(api)
+        this.RythmActive = _buildRythmActive(api)
+        this.RythmConnected = _buildRythmConnected(api)
+        this.RythmMode = _buildRythmMode(api)
+        this.RythmAuxAvailable = _buildRythmAuxAvailable(api)
+        this.NanoleafCustomEventNotifications = _buildNanoleafCustomEventNotifications(api)
+
+        this.LayoutDetectionButton = _buildLayoutDetectionButton(api)
+        this.LayoutData = _buildLayoutData(api)
+        this.GlobalOrientation = _buildGlobalOrientation(api)
+        this.ProductWarnings = _buildProductWarning(api)
+
+        this.NewFirmwareVersion = _buildNewFirmwareVersion(api)
+        this.FirmwareAvailability = _buildFirmwareAvailability(api)
+        this.InstallFirmwareUpdate = _buildInstallFirmwareUpdate(api)
+
+        this.SyncState = _buildSyncState(api)
+        this.RestoreFromCloud = _buildRestoreFromCloud(api)
+
+        this.LayoutDetectionService = _buildLayoutDetectionService(api, this)
+        this.AnimationService = _buildAnimationService(api, this)
+        this.FirmwareUpdateService = _buildFirmwareUpdateService(api, this)
+        this.CloudSyncService = _buildCloudSyncService(api, this)
 
         this._KnownServiceMap = mapShort(listKnownServices(api, this)) as ServiceItem[]
-        this._KnownCharMap = mapShort(listKnownCharacteristics(api)) as CharacteristicItem[]
+        this._KnownCharMap = mapShort(listKnownCharacteristics(api, this)) as CharacteristicItem[]
 
         // this.EveAirQuality = class EveAirQuality extends api.hap.Characteristic {
         //     static readonly UUID: string = 'E863F10B-079E-48FF-8F27-9C2605A29F52'
