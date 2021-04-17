@@ -424,7 +424,7 @@ export class HKClient implements IHKClient {
             return
         }
         //console.log('COUNT', this.supportedAccessories.length)
-        this.supportedAccessories.forEach((acc: AcceessoryDescription, idx: number) => {
+        this.supportedAccessories.forEach((acc: AcceessoryDescription) => {
             //console.log('ACC', idx)
             const has = function (type: WithUUID<new () => Service>, cType: WithUUID<new () => Characteristic>) {
                 const s = acc.services.find((s: ServiceDescription) => s.create && s.create.UUID === type.UUID)
