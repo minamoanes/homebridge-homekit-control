@@ -16,6 +16,11 @@ import { HttpClient } from 'hap-controller'
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings'
 import { Accessories } from 'hap-controller/lib/transport/ble/gatt-client'
 
+interface SetCharQueue {
+    char: ExtendedCharacteristic
+    value: any
+    c: CharacteristicDescription
+}
 interface FakeGatoData {
     interval: number
     timer: NodeJS.Timer | undefined
@@ -133,7 +138,10 @@ export class HKClient implements IHKClient {
                                     })
                                     .filter((c) => {
                                         if (c.create === undefined) {
-                                            this.parent.log.warn(`Missing Type ${c.source.type}`)
+                                            this.parent.log.warn(`Missing Chracteristic Type ${c.source.type}`)
+                                            if (this.serviceConfig.logFoundServices) {
+                                                this.parent.log.warn(JSON.stringify(c.source, null, 4))
+                                            }
                                             return false
                                         }
                                         return true
@@ -237,17 +245,33 @@ export class HKClient implements IHKClient {
             .catch((e) => this.parent.log.error('get', c.cname, e))
     }
 
-    private _setCharacteristicValue(char: ExtendedCharacteristic, value: any, c: CharacteristicDescription) {
-        const data = {}
-        data[c.cname] = value
+    private setQueue: SetCharQueue[] = []
+    private setQueWaiting = false
 
+    private _setCharacteristicValue(char: ExtendedCharacteristic, value: any, c: CharacteristicDescription) {
+        if (this.setQueWaiting) {
+            this.parent.log.debug(this.name, 'defering value to', char.displayName, value)
+            this.setQueue = this.setQueue.filter((item) => item.char != char)
+            this.setQueue.push({ char: char, value: value, c: c })
+            return
+        }
+        this.setQueWaiting = true
+        const data = {}
+        const self = this
+        data[c.cname] = value
+        this.parent.log.debug(this.name, 'returning value to', char.displayName, value)
         this.con()
             .setCharacteristics(data)
             .then(() => {
                 c.value = value
-                this.parent.log.info('Wrote Value', c.cname, c.value)
+                self.parent.log.info(self.name, 'Wrote Value', c.cname, char.displayName, c.value)
+                self.setQueWaiting = false
+                if (self.setQueue.length > 0) {
+                    const qi = self.setQueue.shift()
+                    setTimeout(() => self._setCharacteristicValue(qi!.char, qi!.value, qi!.c), 200)
+                }
             })
-            .catch((e) => this.parent.log.error('set', c.cname, e))
+            .catch((e) => this.parent.log.error(this.name, 'set', c.cname, e))
     }
 
     private initAccessoryService(sData: ServiceDescription, service: Service) {
@@ -458,9 +482,9 @@ export class HKClient implements IHKClient {
                         if (h.data.ppm) {
                             if (h.data.ppm.connect?.UUID === this.parent.api.hap.Characteristic.PM2_5Density.UUID || h.data.ppm.connect?.UUID === this.parent.api.hap.Characteristic.PM10Density.UUID) {
                                 //sems to be ug/m3 not ppm => convert like https://github.com/simont77/fakegato-history/issues/107
-                                return Math.max(500, h.data.ppm.value / 4.57)
+                                return Math.max(450, h.data.ppm.value / 4.57)
                             } else {
-                                return Math.max(500, h.data.ppm.value)
+                                return Math.max(450, h.data.ppm.value)
                             }
                         }
 
@@ -508,7 +532,7 @@ export class HKClient implements IHKClient {
 
                         if (c) {
                             if (k === 'ppm') {
-                                data[k] = Math.max(500, c.value)
+                                data[k] = Math.max(450, c.value)
                             } else {
                                 data[k] = c.value
                             }
