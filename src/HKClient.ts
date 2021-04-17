@@ -146,6 +146,10 @@ export class HKClient implements IHKClient {
                     return aRes
                 })
 
+                if (this.serviceConfig.logFoundServices) {
+                    this.logSourceServices()
+                }
+
                 if (this.didFinishWasDefered) {
                     this.didFinishWasDefered = false
                     this.didFinishLaunching()
@@ -172,6 +176,38 @@ export class HKClient implements IHKClient {
         }
     }
 
+    logSourceServices() {
+        this.parent.log.info(
+            this.supportedAccessories
+                .map((a: AcceessoryDescription, i) => {
+                    const services = a.services
+                        .map((s: ServiceDescription) => {
+                            let name = '?'
+                            if (s.create) {
+                                const ss = new s.create()
+                                name = ss.displayName
+                            }
+                            const chars = s.characteristics
+                                .map((c: CharacteristicDescription) => {
+                                    let name = '?'
+                                    let props = ''
+                                    if (c.create) {
+                                        const cc = new c.create()
+                                        name = cc.displayName
+                                        props = JSON.stringify(cc.props)
+                                    }
+                                    return `${name}, ${c.create?.UUID}: ${c.value}\n        (${props})}`
+                                })
+                                .join('\n    - ')
+                            return `Service ${name}, ${s.source.type}, ${s.create?.UUID}\n    - ${chars}`
+                        })
+                        .join('\n - ')
+                    return `Accessory ${i + 1}:\n - ${services}`
+                })
+                .join('\n')
+        )
+    }
+
     con(): HttpClient {
         return new HttpClient(this.serviceConfig.id, this.serviceConfig.address, this.serviceConfig.port, this.serviceConfig.pairingData)
     }
@@ -190,7 +226,7 @@ export class HKClient implements IHKClient {
             .then((inData: any) => {
                 const data = inData as HttpClientService
                 c.value = data.characteristics[0].value
-                this.parent.log.debug('Received Value', c.cname, c.value)
+                this.parent.log.debug(this.name, 'Received Value', c.cname, char.displayName, c.value)
                 char.updateValue(c.value)
 
                 if (char.chain && char.chainValue) {
@@ -370,7 +406,9 @@ export class HKClient implements IHKClient {
         if (this.fakeGato.interval <= 0) {
             return
         }
-        this.supportedAccessories.forEach((acc: AcceessoryDescription) => {
+        //console.log('COUNT', this.supportedAccessories.length)
+        this.supportedAccessories.forEach((acc: AcceessoryDescription, idx: number) => {
+            //console.log('ACC', idx)
             const has = function (type: WithUUID<new () => Service>, cType: WithUUID<new () => Characteristic>) {
                 const s = acc.services.find((s: ServiceDescription) => s.create && s.create.UUID === type.UUID)
                 if (s === undefined) {
@@ -391,6 +429,7 @@ export class HKClient implements IHKClient {
                 },
                 history: [],
             }
+            //console.log(idx, acc.fakeGato)
 
             //Add history Providers
             acc.fakeGato.history = []

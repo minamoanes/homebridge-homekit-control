@@ -24,6 +24,13 @@
                             "placeholder": "Enter a Custom Name",
                             "description": "The Plugin will receive the Name from the Device. You may overrride that default name here."
                         },
+                        "logFoundServices": {
+                            "title": "Log Source Services",
+                            "type": "boolean",
+                            "required": false,
+                            "default": false,
+                            "description": "When enabled, we will dump all discovered services from the source Device to the Homebridge Log."
+                        },
                         "enableHistory": {
                             "title": "Enable History",
                             "type": "boolean",

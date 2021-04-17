@@ -14,6 +14,7 @@ export interface HKServiceConfig {
     uniquePrefix?: string
     enableHistory?: boolean
     historyInterval?: number
+    logFoundServices?: boolean
     name?: string
     id: string
     address: string
