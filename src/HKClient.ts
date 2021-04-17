@@ -138,7 +138,7 @@ export class HKClient implements IHKClient {
                                     })
                                     .filter((c) => {
                                         if (c.create === undefined) {
-                                            this.parent.log.warn(`Missing Chracteristic Type ${c.source.type}`)
+                                            this.parent.log.warn(`${this.name}: Missing Chracteristic in ${s.type} with type ${c.source.type}`)
                                             if (this.serviceConfig.logFoundServices) {
                                                 this.parent.log.warn(JSON.stringify(c.source, null, 4))
                                             }
@@ -220,10 +220,20 @@ export class HKClient implements IHKClient {
         return new HttpClient(this.serviceConfig.id, this.serviceConfig.address, this.serviceConfig.port, this.serviceConfig.pairingData)
     }
 
+    private getQueue: SetCharQueue[] = []
+    private getQueWaiting = false
     private _updateCharacteristicValue(char: ExtendedCharacteristic, c: CharacteristicDescription) {
         if (!c.allowValueUpdates) {
             return
         }
+        if (this.getQueWaiting) {
+            this.parent.log.debug(this.name, 'defering read from', char.displayName)
+            this.getQueue = this.getQueue.filter((item) => item.char != char)
+            this.getQueue.push({ char: char, value: 0, c: c })
+            return
+        }
+        this.getQueWaiting = true
+        const self = this
         this.con()
             .getCharacteristics([c.cname], {
                 meta: true,
@@ -240,6 +250,12 @@ export class HKClient implements IHKClient {
                 if (char.chain && char.chainValue) {
                     this.parent.log.debug(` ==> Chain received value from ${c.cname} to ${char.chain.displayName} (Value=${char.chainValue()})`)
                     char.chain.updateValue(char.chainValue())
+                }
+
+                self.getQueWaiting = false
+                if (self.getQueue.length > 0) {
+                    const qi = self.getQueue.shift()
+                    setTimeout(() => self._updateCharacteristicValue(qi!.char, qi!.c), 200)
                 }
             })
             .catch((e) => this.parent.log.error('get', c.cname, e))
