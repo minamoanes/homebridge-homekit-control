@@ -4,7 +4,7 @@
         "type": "git",
         "url": "git+ssh://git@github.com:quiqueck/homebridge-homekit-proxy.git"
     },
-    "version": "0.1.10-beta.0",
+    "version": "0.1.10",
     "bin": {
         "homekitPair": "./cli.js"
     },
