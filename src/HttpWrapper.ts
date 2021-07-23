@@ -179,7 +179,7 @@ export class HttpWrapper {
             self.listeners
                 .filter((l) => l.c.cname === cname)
                 .forEach((l) => {
-                    this.log.debug(`Notifiying listener for ${l.c.connect?.displayName} (${cname})`)
+                    self.log.debug(`Notifiying listener for ${l.c.connect?.displayName} (${cname})`)
                     l.listener(cc)
                 })
         })

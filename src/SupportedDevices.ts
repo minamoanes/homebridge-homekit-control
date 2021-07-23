@@ -534,8 +534,8 @@ export class SupportedServices {
     }
 
     classForService(type: string, source: HttpClientService | undefined) {
-        console.log('AAAAA', type)
         const cl = classFromID(this._KnownServiceMap, type) as WithUUID<new () => Service> | undefined
+
         if (source === undefined) {
             return cl
         }
