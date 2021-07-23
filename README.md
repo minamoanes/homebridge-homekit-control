@@ -89,7 +89,9 @@ This Plugin supports the Configuration Interface in Homebridge UI (homebridge-co
 Here are some additional configuration parameters, not obtained by the Device Pairing:
 - `services.enableHistory` (*boolean*): **true** will enable fakeGato for compatible Sensors. This will allow you to view a history in the EVE-App
 - `services.historyInterval` (optional, *numeric*): Determins the Interval used to take readings. The valus range is **[30, 600]**. The default value is **600**
+- - `services.proxyAll`(optional, *boolean*): By default we only proxy tested services and characteristics from your devices. When this mode is enabled, all available services and characteristics are proxied. Be carefull when activating, this may cause damage to your devices. The default value is **false**
 - `services.uniquePrefix`(optional, *string*): When a device is added to multiple HomeBridge instances in the same network, you will need to provide a unique prefix. Otherwise Eve-App will get confused.
+
 
 #### Example
 ```

@@ -20,6 +20,7 @@ export interface HKServiceConfig {
     address: string
     port: number
     pairingData: PairingData
+    proxyAll?: boolean
 }
 export interface HKPlatformConfig extends PlatformConfig {
     services: HKServiceConfig[]

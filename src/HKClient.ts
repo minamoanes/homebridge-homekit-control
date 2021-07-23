@@ -137,6 +137,10 @@ export class HKClient implements IHKClient {
                 this.fakeGato.interval = 600
             }
         }
+
+        if (serviceConfig.proxyAll === undefined) {
+            serviceConfig.proxyAll = false
+        }
     }
 
     _loadDevices(data: Accessories) {
@@ -149,12 +153,12 @@ export class HKClient implements IHKClient {
                 },
                 services: acc.services.map((s: HttpClientService) => {
                     const sRes: ServiceDescription = {
-                        create: this.parent.supported.classForService(s.type),
+                        create: this.parent.supported.classForService(s.type, this.serviceConfig.proxyAll ? s : undefined),
                         uname: `${this.uuid}.${acc.aid}.${s.iid}`,
                         characteristics: s.characteristics
                             .map((c: HttpClientCharacteristic) => {
                                 const cRes: CharacteristicDescription = {
-                                    create: this.parent.supported.classForChar(c.type),
+                                    create: this.parent.supported.classForChar(c.type, this.serviceConfig.proxyAll ? c : undefined),
                                     uname: `${this.uuid}.${acc.aid}.${s.iid}.${c.iid}`,
                                     cname: `${acc.aid}.${c.iid}`,
                                     value: c.value,

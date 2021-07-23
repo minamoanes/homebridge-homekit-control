@@ -31,6 +31,13 @@
                             "default": false,
                             "description": "When enabled, we will dump all discovered services from the source Device to the Homebridge Log."
                         },
+                        "proxyAll": {
+                            "title": "Proxy All",
+                            "type": "boolean",
+                            "required": false,
+                            "default": false,
+                            "description": "When enabled, we will Proxy everything from connected clients. This does not filter any requests and may is of course untested for unkwnown services but it will enable devices that are not yet manually configured"
+                        },
                         "enableHistory": {
                             "title": "Enable History",
                             "type": "boolean",

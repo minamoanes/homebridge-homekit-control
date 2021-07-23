@@ -1,6 +1,7 @@
 import { Characteristic, Service, API, WithUUID, Perms, Formats, CharacteristicProps } from 'homebridge'
 import { inherits } from 'util'
 import fakegato from 'fakegato-history'
+import { HttpClientCharacteristic, HttpClientService } from './Interfaces'
 
 export function listKnownServices(api: API, parent: SupportedServices): WithUUID<new () => Service>[] {
     return [
@@ -378,6 +379,7 @@ function _buildCloudSyncService(api: API, parent: SupportedServices): WithUUID<n
     return generateService(api, 'Cloud Sync', 'A18EB901-CFA1-4D37-A10F-0071CEEEEEBD', [parent.SyncState, parent.RestoreFromCloud])
 }
 export class SupportedServices {
+    private api: API
     private _KnownServiceMap: ServiceItem[]
     private _KnownCharMap: CharacteristicItem[]
     public readonly EveAirQuality: WithUUID<new () => Characteristic>
@@ -420,6 +422,7 @@ export class SupportedServices {
     public readonly InstallFirmwareUpdate: WithUUID<new () => Characteristic>
 
     constructor(api: API) {
+        this.api = api
         this.EveAirQuality = _buildEveAirQuality(api)
         this.FakeGatoService = fakegato(api)
 
@@ -482,11 +485,128 @@ export class SupportedServices {
         return this._KnownCharMap
     }
 
-    classForService(type: string) {
-        return classFromID(this._KnownServiceMap, type) as WithUUID<new () => Service> | undefined
+    isID(needle: string, haystack: string): boolean {
+        needle = needle.toLocaleUpperCase().trim()
+        haystack = haystack.toLocaleUpperCase().trim()
+        if (needle === haystack) {
+            return true
+        }
+        while (needle.length < 8) {
+            needle = '0' + needle
+        }
+        haystack = haystack.substring(0, 8)
+
+        return needle === haystack
     }
 
-    classForChar(type: string) {
-        return classFromID(this._KnownCharMap, type) as WithUUID<new () => Characteristic> | undefined
+    toPerm(inp: string[]): Perms[] {
+        return inp.map((p: string) => {
+            if (p === 'pw') {
+                return Perms.PAIRED_WRITE
+            }
+            if (p === 'wr') {
+                return Perms.WRITE_RESPONSE
+            }
+            if (p === 'pr') {
+                return Perms.PAIRED_READ
+            }
+            if (p === 'ev') {
+                return Perms.EVENTS
+            }
+            if (p === 'aa') {
+                return Perms.ADDITIONAL_AUTHORIZATION
+            }
+            if (p === 'tw') {
+                return Perms.TIMED_WRITE
+            }
+            return Perms.HIDDEN
+        })
+    }
+
+    classForService(type: string, source: HttpClientService | undefined) {
+        console.log('AAAAA', type)
+        const cl = classFromID(this._KnownServiceMap, type) as WithUUID<new () => Service> | undefined
+        if (source === undefined) {
+            return cl
+        }
+        //auto-create new service
+        if (cl == undefined) {
+            const allKeys = Object.keys(this.api.hap.Service)
+            const matches = allKeys
+                .filter((key) => this.api.hap.Service[key].UUID != undefined)
+                .map((key) => this.api.hap.Service[key])
+                .filter((service) => this.isID(type, service.UUID))
+            if (matches.length == 1 || matches.length == 0) {
+                let s
+                if (matches.length == 1) {
+                    s = matches[0]
+                } else {
+                    const characteristics = source.characteristics.map((cIn) => this.classForChar(cIn.type, cIn))
+                    const names = characteristics.filter((c) => c.type === '23')
+                    const name = names.length > 0 ? names[0].value : undefined
+
+                    s = generateService(this.api, name == undefined ? 'S-AUTO-' + type : name, type, characteristics)
+                }
+                this._KnownServiceMap.push({
+                    id: s.UUID,
+                    cls: s,
+                })
+                this._KnownServiceMap.push({
+                    id: shortType(s.UUID),
+                    cls: s,
+                })
+
+                return s
+            }
+        }
+
+        return cl
+    }
+
+    classForChar(type: string, source: HttpClientCharacteristic | undefined) {
+        const cl = classFromID(this._KnownCharMap, type) as WithUUID<new () => Characteristic> | undefined
+        if (source === undefined) {
+            return cl
+        }
+        //auto-create new characteristic
+        if (cl == undefined) {
+            const allKeys = Object.keys(this.api.hap.Characteristic)
+            const matches = allKeys
+                .filter((key) => this.api.hap.Characteristic[key].UUID != undefined)
+                .map((key) => this.api.hap.Characteristic[key])
+                .filter((char) => this.isID(type, char.UUID))
+            if (matches.length == 1 || matches.length == 0) {
+                const name = source.description
+                const c =
+                    matches.length == 1
+                        ? matches[0]
+                        : generateCharacteristic(this.api, name === undefined ? 'C-AUTO-' + type : name, type, {
+                              format: source.format,
+                              perms: this.toPerm(source.perms),
+                              unit: source.unit,
+                              description: source.description,
+                              minValue: source.minValue,
+                              maxValue: source.maxValue,
+                              minStep: source.minStep,
+                              maxLen: source.maxLen,
+                              maxDataLen: source.maxDataLen,
+                              validValues: source.validValues,
+                              validValueRanges: source.validValueRanges,
+                              adminOnlyAccess: source.adminOnlyAccess,
+                          })
+                this._KnownCharMap.push({
+                    id: c.UUID,
+                    cls: c,
+                })
+                this._KnownCharMap.push({
+                    id: shortType(c.UUID),
+                    cls: c,
+                })
+
+                return c
+            }
+        }
+
+        return cl
     }
 }
