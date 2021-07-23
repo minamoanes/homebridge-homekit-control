@@ -15,7 +15,6 @@ import {
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings'
 import { Accessories } from 'hap-controller/lib/transport/ble/gatt-client'
 import { HttpWrapper } from './HttpWrapper'
-import { serviceFromUuid } from 'hap-controller/lib/model/service'
 
 interface FakeGatoData {
     interval: number
@@ -409,7 +408,7 @@ export class HKClient implements IHKClient {
             this.parent.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory])
         } else {
             this.parent.log.debug(`Reconfiguring existing Accesory ${configuredAcc.displayName} (${configuredAcc.UUID})`)
-            const services = accessoryServices.services.map((sData: ServiceDescription) => self._serviceCreator(sData, configuredAcc, accessoryServices.services))
+            /*const services = */ accessoryServices.services.map((sData: ServiceDescription) => self._serviceCreator(sData, configuredAcc, accessoryServices.services))
             //console.log('-----------------------')
             //console.log(accessoryServices.services)
             this.addAditionalServices(accessoryServices, configuredAcc)

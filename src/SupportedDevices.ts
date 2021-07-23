@@ -165,7 +165,6 @@ function generateCharacteristic(api: API, name: string, UUID: string, perms: Cha
     return NewCharacteristic as any
 }
 
-const cccc = 0
 function generateService(api: API, name: string, UUID: string, optionals?: WithUUID<new () => Characteristic>[]): WithUUID<new () => Service> {
     if (optionals === undefined) {
         optionals = []
