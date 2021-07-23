@@ -19,6 +19,8 @@ export function listKnownServices(api: API, parent: SupportedServices): WithUUID
         api.hap.Service.Lightbulb,
         api.hap.Service.Outlet,
         api.hap.Service.LightSensor,
+        api.hap.Service.IrrigationSystem,
+        api.hap.Service.Valve,
         parent.LayoutDetectionService,
         parent.AnimationService,
         parent.FirmwareUpdateService,
@@ -60,6 +62,14 @@ export function listKnownCharacteristics(api: API, parent: SupportedServices): W
         api.hap.Characteristic.CurrentAmbientLightLevel,
         api.hap.Characteristic.AirParticulateDensity,
         api.hap.Characteristic.ChargingState,
+        api.hap.Characteristic.Active,
+        api.hap.Characteristic.ProgramMode,
+        api.hap.Characteristic.InUse,
+        api.hap.Characteristic.RemainingDuration,
+        api.hap.Characteristic.StatusFault,
+        api.hap.Characteristic.ValveType,
+        api.hap.Characteristic.SetDuration,
+        api.hap.Characteristic.ServiceLabelIndex,
         parent.CloudHomeSync,
         parent.CloudHomeSyncDescription,
         parent.CloudProvisioningHashString,
@@ -545,7 +555,7 @@ export class SupportedServices {
                     const names = characteristics.filter((c) => c.type === '23')
                     const name = names.length > 0 ? names[0].value : undefined
 
-                    s = generateService(this.api, name == undefined ? 'S-AUTO-' + type : name, type, characteristics)
+                    s = generateService(this.api, name == undefined ? '' : name, type, characteristics)
                 }
                 this._KnownServiceMap.push({
                     id: s.UUID,
@@ -580,7 +590,7 @@ export class SupportedServices {
                 const c =
                     matches.length == 1
                         ? matches[0]
-                        : generateCharacteristic(this.api, name === undefined ? 'C-AUTO-' + type : name, type, {
+                        : generateCharacteristic(this.api, name === undefined ? '' : name, type, {
                               format: source.format,
                               perms: this.toPerm(source.perms),
                               unit: source.unit,

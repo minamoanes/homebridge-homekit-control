@@ -131,5 +131,8 @@ The command `npm rund build` will trigger the compilation of your project manual
 (!!! Use at your own risk !!!)
 - Quingping Air Monitor Lite (Cleargrass Luftdetektor Lite, Cleargrass Air Monitor Lite)
 - Nanoleaf Aurora / Light Panels
+- Gardena Smart Controll Hub
+  - Gardena Irrigation Controll
+  - Gardena Sensor II
   
 Please let me know if you use this plugin and got it to work with a new HomeKit-Accesory that is not listed above
