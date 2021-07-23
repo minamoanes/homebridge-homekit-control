@@ -308,7 +308,6 @@ export class HKClient implements IHKClient {
                 if (c.source.perms && c.source.perms.indexOf('pr') >= 0) {
                     char.on('get', (callback) => {
                         self._updateCharacteristicValue(char, c)
-                        console.log('333333')
                         callback(null, c.value)
                     })
                 }
@@ -316,7 +315,6 @@ export class HKClient implements IHKClient {
                 if ((c.source.perms && c.source.perms.indexOf('pw') >= 0) || c.source.perms.indexOf('tw') >= 0) {
                     char.on('set', (value, callback) => {
                         self._setCharacteristicValue(char, value, c)
-                        console.log('22222')
                         callback(null)
                     })
                 }
@@ -361,7 +359,7 @@ export class HKClient implements IHKClient {
             //let service: Service | undefined = accessory.getServiceById(sData.uuid, subtype)
             let service: Service | undefined = accessory.services.find((s) => s.UUID === sData.uuid && s.subtype === subtype)
 
-            console.log(serviceGeneral !== undefined, service !== undefined)
+            //console.log(serviceGeneral !== undefined, service !== undefined)
             //some services are predefined without an iid, so we keep them
             // if (service === undefined && serviceGeneral !== undefined) {
             //     const aService = new sData.create(subtype)
@@ -403,7 +401,7 @@ export class HKClient implements IHKClient {
             const accessory = new this.parent.api.platformAccessory(this.name, this.uuid)
             this.parent.log.debug(`Building new Accessory ${accessory.displayName} (${accessory.UUID})`)
             accessoryServices.services.map((sData: ServiceDescription) => self._serviceCreator(sData, accessory))
-            console.log(accessoryServices.services)
+            //console.log(accessoryServices.services)
             this.addAditionalServices(accessoryServices, accessory)
 
             // register the accessory
@@ -411,8 +409,8 @@ export class HKClient implements IHKClient {
         } else {
             this.parent.log.debug(`Reconfiguring existing Accesory ${configuredAcc.displayName} (${configuredAcc.UUID})`)
             const services = accessoryServices.services.map((sData: ServiceDescription) => self._serviceCreator(sData, configuredAcc))
-            console.log('-----------------------')
-            console.log(accessoryServices.services)
+            //console.log('-----------------------')
+            //console.log(accessoryServices.services)
             this.addAditionalServices(accessoryServices, configuredAcc)
 
             configuredAcc._wasUsed = true
