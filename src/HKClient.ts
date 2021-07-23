@@ -1,4 +1,4 @@
-import { PlatformAccessory, Service, Characteristic, CharacteristicProps, WithUUID, APIEvent } from 'homebridge'
+import { PlatformAccessory, Service, Characteristic, CharacteristicProps, WithUUID, APIEvent, Formats } from 'homebridge'
 import {
     AcceessoryDescription,
     CharacteristicDescription,
@@ -52,7 +52,7 @@ function copyProps(source: HttpClientCharacteristic, char: ExtendedCharacteristi
         props.maxLen = source.maxLen
     }
     if (source.maxDataLen !== undefined) {
-        props.maxDataLen = source.maxDataLen
+        props.maxDataLen = source.maxDataLen + 4
     }
     if (source.validValues !== undefined) {
         props.validValues = source.validValues
@@ -105,18 +105,24 @@ export class HKClient implements IHKClient {
         this.client
             .getAccessories()
             .then((inData: any) => {
-                //looks like this Gatt-Result is the actual return type for httpClient as well
-                self._loadDevices(inData as Accessories)
-                self.accesoriesWereLoaded = true
+                this._preloadValues(inData as Accessories)
+                    .then(() => {
+                        //looks like this Gatt-Result is the actual return type for httpClient as well
+                        self._loadDevices(inData as Accessories)
+                        self.accesoriesWereLoaded = true
 
-                if (this.serviceConfig.logFoundServices) {
-                    this.logSourceServices()
-                }
+                        if (this.serviceConfig.logFoundServices) {
+                            this.logSourceServices()
+                        }
 
-                if (this.didFinishWasDefered) {
-                    this.didFinishWasDefered = false
-                    this.didFinishLaunching()
-                }
+                        if (this.didFinishWasDefered) {
+                            this.didFinishWasDefered = false
+                            this.didFinishLaunching()
+                        }
+                    })
+                    .catch((e) => {
+                        self.parent.log.error('Error', e)
+                    })
             })
             .catch((e) => {
                 self.parent.log.error('Error', e)
@@ -143,6 +149,47 @@ export class HKClient implements IHKClient {
         }
     }
 
+    async _preloadValues(data: Accessories) {
+        const list = data.accessories
+            .map((a) => {
+                return a.services.map((s) => {
+                    const r = s.characteristics
+                        .filter((c: HttpClientCharacteristic) => c.value === null)
+                        .map((c: HttpClientCharacteristic) => {
+                            const cany = c as any
+                            cany.cname = `${a.aid}.${c.iid}`
+                            cany.hadResonse = false
+                            return c
+                        })
+                    return r
+                })
+            })
+            .flat(2)
+        const chars = list.map((c: any) => c.cname)
+        const inData: any = await this.con().getCharacteristics(chars, {
+            meta: false,
+            perms: false,
+            type: false,
+            ev: false,
+        })
+
+        //console.log(inData)
+        const newValues = inData.characteristics.filter((d) => d.value !== undefined && d.value != null)
+        this.parent.log.debug('Preloaded Values')
+        this.parent.log.debug(newValues)
+
+        data.accessories.forEach((a) =>
+            a.services.forEach((s) =>
+                s.characteristics.forEach((c: HttpClientCharacteristic) => {
+                    const val = newValues.find((v) => v.aid == a.aid && c.iid == v.iid)
+                    if (val !== undefined) {
+                        c.value = val.value
+                    }
+                })
+            )
+        )
+    }
+
     _loadDevices(data: Accessories) {
         this.supportedAccessories = data.accessories.map((acc: HttpClientAccesory) => {
             const aRes: AcceessoryDescription = {
@@ -158,6 +205,10 @@ export class HKClient implements IHKClient {
                     if (name.length > 0) {
                         displayName = name[0].value
                     }
+                    if (displayName === undefined || displayName === null) {
+                        displayName = `c-${s.iid}`
+                    }
+
                     const cl = this.parent.supported.classForService(s.type, this.serviceConfig.proxyAll ? s : undefined)
                     const sRes: ServiceDescription = {
                         create: cl,
@@ -167,8 +218,11 @@ export class HKClient implements IHKClient {
                         iid: s.iid,
                         characteristics: s.characteristics
                             .map((c: HttpClientCharacteristic) => {
+                                const ccl = this.parent.supported.classForChar(c.type, this.serviceConfig.proxyAll ? c : undefined)
                                 const cRes: CharacteristicDescription = {
-                                    create: this.parent.supported.classForChar(c.type, this.serviceConfig.proxyAll ? c : undefined),
+                                    create: ccl,
+                                    uuid: ccl.UUID,
+                                    iid: c.iid === undefined ? 0 : c.iid,
                                     uname: `${this.uuid}.${acc.aid}.${s.iid}.${c.iid}`,
                                     cname: `${acc.aid}.${c.iid}`,
                                     value: c.value,
@@ -243,17 +297,20 @@ export class HKClient implements IHKClient {
 
         this.con()
             .getCharacteristics([c.cname], {
-                meta: true,
-                perms: true,
-                type: true,
-                ev: true,
+                meta: false,
+                perms: false,
+                type: false,
+                ev: false,
             })
             .then((inData: any) => {
                 const data = inData as HttpClientService
                 const old = c.value
-                c.value = data.characteristics[0].value
+                c.value = this.checkValue(data.characteristics[0].value, char.props)
                 self.parent.log.debug(`${self.name} - received ${char.displayName}=${c.value} (was ${old}, ${c.cname})`)
-                char.updateValue(c.value)
+
+                if (c.value != null) {
+                    char.updateValue(c.value)
+                }
 
                 if (char.chain && char.chainValue) {
                     this.parent.log.debug(` ==> Chain received value from ${char.displayName} to ${char.chain.displayName} (Value=${char.chainValue()})`)
@@ -262,10 +319,48 @@ export class HKClient implements IHKClient {
             })
             .catch((e) => {
                 self.parent.log.error(`${self.name} - get error ${char.displayName}=${c.value} (${c.cname}, ${e})`)
+                console.error(e)
             })
     }
 
+    private checkValue(value: any, props: CharacteristicProps | HttpClientCharacteristic): any {
+        let didChange = true
+        if (value === null || value === undefined) {
+            value = 0
+            didChange = false
+        }
+
+        if (props.minValue !== undefined) {
+            didChange = true
+            value = Math.max(props.minValue, value)
+        }
+        if (props.maxValue !== undefined) {
+            didChange = true
+            value = Math.min(props.maxValue, value)
+        }
+
+        if (props.format === Formats.DATA && props.maxDataLen) {
+            didChange = true
+        }
+
+        if (props.format === Formats.STRING) {
+            didChange = true
+            value = '' + value
+        }
+
+        if (!didChange) {
+            return null
+        }
+
+        return value
+    }
+
     private _setCharacteristicValue(char: ExtendedCharacteristic, value: any, c: CharacteristicDescription) {
+        value = this.checkValue(value, char.props)
+        if (value == null) {
+            return
+        }
+
         const data = {}
         const self = this
         data[c.cname] = value
@@ -298,34 +393,61 @@ export class HKClient implements IHKClient {
                 }
 
                 if (c.source.value !== undefined) {
-                    service.setCharacteristic(c.create, c.value)
+                    const value = this.checkValue(c.value, c.source)
+                    if (value != null) {
+                        service.setCharacteristic(c.create, value)
+                    }
                 }
-                const char = service.getCharacteristic(c.create) as ExtendedCharacteristic
+
+                const char = service.characteristics.find((cc) => cc.UUID === c.uuid) as ExtendedCharacteristic
+                //const char = service.getCharacteristic(c.create as any) as ExtendedCharacteristic
+                if (char === undefined) {
+                    this.parent.log.error('Unknown Characteristic: ', c.cname, service.UUID, service.characteristics.map((c) => `${c.iid}-${c.displayName}`).join(','))
+                    return
+                }
                 c.connect = char
                 copyProps(c.source, char)
 
                 if (c.source.perms && c.source.perms.indexOf('pr') >= 0) {
+                    if (char.hasOnGet) {
+                        console.log('ALREADY HAS a GET WATCH', c.cname, c.uuid)
+                    } else {
+                        console.log('ADDING GET WATCH', c.cname, c.uuid)
+                    }
+
+                    char.hasOnGet = true
                     char.on('get', (callback) => {
-                        self._updateCharacteristicValue(char, c)
+                        c.value = this.checkValue(c.value, char.props)
+                        //console.log('GET GET GET', c.cname, callback)
+
                         callback(null, c.value)
+
+                        self._updateCharacteristicValue(char, c)
                     })
                 }
 
                 if ((c.source.perms && c.source.perms.indexOf('pw') >= 0) || c.source.perms.indexOf('tw') >= 0) {
                     char.on('set', (value, callback) => {
                         self._setCharacteristicValue(char, value, c)
-                        callback(null)
+                        //console.log('SET SET SET')
+                        if (c.source.perms && c.source.perms.indexOf('wr') >= 0) {
+                            callback(null, value)
+                        } else {
+                            callback(null, null)
+                        }
                     })
                 }
 
-                if (c.allowValueUpdates && c.source.perms && c.source.perms.indexOf('ev') >= 0) {
+                if (c.allowValueUpdates && c.source.perms && c.source.perms.indexOf('ev') >= 0 && c.source.ev) {
                     const cl = this.con()
                     cl.on(c, (data) => {
-                        if (data.value) {
+                        if (data.value !== undefined && data.value !== null) {
                             this.parent.log.debug(`${this.name} - Got Event for ${char.displayName} (${c.cname}). Changed value ${c.value} => ${data.value}`)
 
-                            c.value = data.value
-                            char.updateValue(data.value)
+                            c.value = this.checkValue(data.value, char.props)
+                            if (c.value != null) {
+                                char.updateValue(data.value)
+                            }
 
                             if (char.chain && char.chainValue) {
                                 this.parent.log.debug(` ==> Chain event from ${char.displayName} to ${char.chain.displayName} (Value=${char.chainValue()})`)
@@ -352,7 +474,7 @@ export class HKClient implements IHKClient {
     private _serviceCreator(sData: ServiceDescription, accessory: PlatformAccessory, allServices: ServiceDescription[]) {
         if (sData.create) {
             const hasSameService = allServices.filter((s) => s.uuid === sData.uuid).length > 1
-            const subtype = sData.displayName !== undefined ? sData.displayName : `${sData.iid}`
+            const subtype = sData.displayName !== undefined && sData.displayName !== null ? sData.displayName : `${sData.iid}`
             const serviceGeneral: Service | undefined = accessory.getService(sData.create as any)
 
             //this method does some strange compating (uuid with displayname), better implement our own search...
@@ -368,9 +490,17 @@ export class HKClient implements IHKClient {
             //         service = serviceGeneral
             //     }
             // }
+            if (service !== undefined) {
+                this.parent.log.debug(`REUSING SERVICE', uuid=${service.UUID}, st=${subtype}, nst=${service.subtype}, niid=${service.iid}, iid=${sData.iid}`)
+                accessory.removeService(service)
+                service = undefined
+            }
 
             if (service === undefined) {
-                const newService = new sData.create(sData.displayName, subtype)
+                let newService = new sData.create(sData.displayName, subtype)
+                if (newService.UUID !== sData.uuid) {
+                    newService = new sData.create(undefined, undefined)
+                }
 
                 this.parent.log.debug(`NEW SERVICE, uuid=${sData.uuid} nuuid=${newService.UUID}, st=${subtype}, nst=${newService.subtype}, niid=${newService.iid}, dn=${newService.displayName}`)
                 try {
@@ -380,7 +510,7 @@ export class HKClient implements IHKClient {
                     this.parent.log.error(e)
                 }
             } else {
-                this.parent.log.debug(`REUSING SERVICE', uuid=${service.UUID}, st=${subtype}, nst=${service.subtype}, niid=${service.iid}, iid=${sData.iid}`)
+                //this.parent.log.debug(`REUSING SERVICE', uuid=${service.UUID}, st=${subtype}, nst=${service.subtype}, niid=${service.iid}, iid=${sData.iid}`)
             }
 
             if (service) {
@@ -405,7 +535,11 @@ export class HKClient implements IHKClient {
             this.addAditionalServices(accessoryServices, accessory)
 
             // register the accessory
-            this.parent.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory])
+            try {
+                this.parent.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory])
+            } catch (e) {
+                this.parent.log.error(e)
+            }
         } else {
             this.parent.log.debug(`Reconfiguring existing Accesory ${configuredAcc.displayName} (${configuredAcc.UUID})`)
             /*const services = */ accessoryServices.services.map((sData: ServiceDescription) => self._serviceCreator(sData, configuredAcc, accessoryServices.services))

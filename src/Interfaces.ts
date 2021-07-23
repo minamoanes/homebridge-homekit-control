@@ -44,6 +44,7 @@ export interface HKPlatformAccessory extends PlatformAccessory {
 
 export interface ExtendedCharacteristic extends Characteristic {
     chain?: Characteristic
+    hasOnGet?: boolean
     chainValue?: () => any
 }
 
@@ -51,6 +52,8 @@ export interface CharacteristicDescription {
     create?: WithUUID<new () => Characteristic>
     uname: string
     cname: string
+    uuid: string
+    iid: number
     value?: any
     source: HttpClientCharacteristic
     allowValueUpdates: boolean

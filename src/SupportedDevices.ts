@@ -529,6 +529,9 @@ export class SupportedServices {
             if (p === 'tw') {
                 return Perms.TIMED_WRITE
             }
+            if (p === 'hd') {
+                return Perms.HIDDEN
+            }
             return Perms.HIDDEN
         })
     }
@@ -552,7 +555,7 @@ export class SupportedServices {
                     s = matches[0]
                 } else {
                     const characteristics = source.characteristics.map((cIn) => this.classForChar(cIn.type, cIn))
-                    const names = characteristics.filter((c) => c.type === '23')
+                    const names = source.characteristics.filter((c) => c.type === '23' || c.type === this.api.hap.Characteristic.Name.UUID)
                     const name = names.length > 0 ? names[0].value : undefined
 
                     s = generateService(this.api, name == undefined ? '' : name, type, characteristics)
@@ -573,6 +576,24 @@ export class SupportedServices {
         return cl
     }
 
+    copyCharacteristic(type: string, source: HttpClientCharacteristic) {
+        const name = source.description
+        return generateCharacteristic(this.api, name === undefined ? '' : name, type, {
+            format: source.format,
+            perms: this.toPerm(source.perms),
+            unit: source.unit,
+            description: source.description,
+            minValue: source.minValue,
+            maxValue: source.maxValue,
+            minStep: source.minStep,
+            maxLen: source.maxLen,
+            maxDataLen: source.maxDataLen,
+            validValues: source.validValues,
+            validValueRanges: source.validValueRanges,
+            adminOnlyAccess: source.adminOnlyAccess,
+        })
+    }
+
     classForChar(type: string, source: HttpClientCharacteristic | undefined) {
         const cl = classFromID(this._KnownCharMap, type) as WithUUID<new () => Characteristic> | undefined
         if (source === undefined) {
@@ -586,24 +607,7 @@ export class SupportedServices {
                 .map((key) => this.api.hap.Characteristic[key])
                 .filter((char) => this.isID(type, char.UUID))
             if (matches.length == 1 || matches.length == 0) {
-                const name = source.description
-                const c =
-                    matches.length == 1
-                        ? matches[0]
-                        : generateCharacteristic(this.api, name === undefined ? '' : name, type, {
-                              format: source.format,
-                              perms: this.toPerm(source.perms),
-                              unit: source.unit,
-                              description: source.description,
-                              minValue: source.minValue,
-                              maxValue: source.maxValue,
-                              minStep: source.minStep,
-                              maxLen: source.maxLen,
-                              maxDataLen: source.maxDataLen,
-                              validValues: source.validValues,
-                              validValueRanges: source.validValueRanges,
-                              adminOnlyAccess: source.adminOnlyAccess,
-                          })
+                const c = matches.length == 1 ? matches[0] : this.copyCharacteristic(type, source)
                 this._KnownCharMap.push({
                     id: c.UUID,
                     cls: c,

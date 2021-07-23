@@ -124,6 +124,16 @@ export class HttpWrapper {
     }
 
     private uct: number = 0
+    public identify() {
+        const self = this
+        return self.list.push(
+            () => {
+                return self.client.identify()
+            },
+            'identify',
+            '-'
+        )
+    }
     public getAccessories(): Promise<Record<string, unknown>> {
         const self = this
         return self.list.push(
