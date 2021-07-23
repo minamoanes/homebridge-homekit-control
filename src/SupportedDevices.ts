@@ -165,13 +165,14 @@ function generateCharacteristic(api: API, name: string, UUID: string, perms: Cha
     return NewCharacteristic as any
 }
 
+const cccc = 0
 function generateService(api: API, name: string, UUID: string, optionals?: WithUUID<new () => Characteristic>[]): WithUUID<new () => Service> {
     if (optionals === undefined) {
         optionals = []
     }
-    const NewService = function (this: any) {
+    const NewService = function (this: any, displayName: string | undefined, UUID: string, subtype?: string) {
         const self: any = this
-        api.hap.Service.call(self, name, UUID)
+        api.hap.Service.call(self, name, UUID, subtype)
         optionals?.forEach((o) => this.addOptionalCharacteristic(o))
     }
     NewService.UUID = UUID

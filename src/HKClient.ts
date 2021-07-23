@@ -15,6 +15,7 @@ import {
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings'
 import { Accessories } from 'hap-controller/lib/transport/ble/gatt-client'
 import { HttpWrapper } from './HttpWrapper'
+import { serviceFromUuid } from 'hap-controller/lib/model/service'
 
 interface FakeGatoData {
     interval: number
@@ -152,9 +153,19 @@ export class HKClient implements IHKClient {
                     history: [],
                 },
                 services: acc.services.map((s: HttpClientService) => {
+                    //console.log('Service:', s)
+                    const name = s.characteristics.filter((c) => c.type === '23' || c.type === '00000023' || c.type === this.parent.api.hap.Characteristic.Name.UUID)
+                    let displayName: string | undefined = undefined
+                    if (name.length > 0) {
+                        displayName = name[0].value
+                    }
+                    const cl = this.parent.supported.classForService(s.type, this.serviceConfig.proxyAll ? s : undefined)
                     const sRes: ServiceDescription = {
-                        create: this.parent.supported.classForService(s.type, this.serviceConfig.proxyAll ? s : undefined),
+                        create: cl,
+                        uuid: cl.UUID,
+                        displayName: displayName,
                         uname: `${this.uuid}.${acc.aid}.${s.iid}`,
+                        iid: s.iid,
                         characteristics: s.characteristics
                             .map((c: HttpClientCharacteristic) => {
                                 const cRes: CharacteristicDescription = {
@@ -195,7 +206,7 @@ export class HKClient implements IHKClient {
                         .map((s: ServiceDescription) => {
                             let name = '?'
                             if (s.create) {
-                                const ss = new s.create()
+                                const ss = new s.create('dn', 'st')
                                 name = ss.displayName
                             }
                             const chars = s.characteristics
@@ -297,6 +308,7 @@ export class HKClient implements IHKClient {
                 if (c.source.perms && c.source.perms.indexOf('pr') >= 0) {
                     char.on('get', (callback) => {
                         self._updateCharacteristicValue(char, c)
+                        console.log('333333')
                         callback(null, c.value)
                     })
                 }
@@ -304,6 +316,7 @@ export class HKClient implements IHKClient {
                 if ((c.source.perms && c.source.perms.indexOf('pw') >= 0) || c.source.perms.indexOf('tw') >= 0) {
                     char.on('set', (value, callback) => {
                         self._setCharacteristicValue(char, value, c)
+                        console.log('22222')
                         callback(null)
                     })
                 }
@@ -341,11 +354,35 @@ export class HKClient implements IHKClient {
     }
     private _serviceCreator(sData: ServiceDescription, accessory: PlatformAccessory) {
         if (sData.create) {
-            let service: Service | undefined = accessory.getService(sData.create as any)
+            const subtype = sData.displayName !== undefined ? sData.displayName : `${sData.iid}`
+            const serviceGeneral: Service | undefined = accessory.getService(sData.create as any)
 
-            if (!service) {
-                service = new sData.create()
-                service = accessory.addService(service)
+            //this method does some strange compating (uuid with displayname), better implement our own search...
+            //let service: Service | undefined = accessory.getServiceById(sData.uuid, subtype)
+            let service: Service | undefined = accessory.services.find((s) => s.UUID === sData.uuid && s.subtype === subtype)
+
+            console.log(serviceGeneral !== undefined, service !== undefined)
+            //some services are predefined without an iid, so we keep them
+            // if (service === undefined && serviceGeneral !== undefined) {
+            //     const aService = new sData.create(subtype)
+            //     console.log('IID', serviceGeneral.iid, sData.iid)
+            //     if (serviceGeneral.iid === null || sData.iid === null) {
+            //         service = serviceGeneral
+            //     }
+            // }
+
+            if (service === undefined) {
+                const newService = new sData.create(sData.displayName, subtype)
+
+                this.parent.log.debug(`NEW SERVICE, uuid=${sData.uuid} nuuid=${newService.UUID}, st=${subtype}, nst=${newService.subtype}, niid=${newService.iid}, dn=${newService.displayName}`)
+                try {
+                    service = accessory.addService(newService)
+                } catch (e) {
+                    this.parent.log.error(`Unable to add new version of service UUID=${newService.UUID}, subtype=${subtype}`)
+                    this.parent.log.error(e)
+                }
+            } else {
+                this.parent.log.debug(`REUSING SERVICE', uuid=${service.UUID}, st=${subtype}, nst=${service.subtype}, niid=${service.iid}, iid=${sData.iid}`)
             }
 
             if (service) {
@@ -366,13 +403,16 @@ export class HKClient implements IHKClient {
             const accessory = new this.parent.api.platformAccessory(this.name, this.uuid)
             this.parent.log.debug(`Building new Accessory ${accessory.displayName} (${accessory.UUID})`)
             accessoryServices.services.map((sData: ServiceDescription) => self._serviceCreator(sData, accessory))
+            console.log(accessoryServices.services)
             this.addAditionalServices(accessoryServices, accessory)
 
             // register the accessory
             this.parent.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory])
         } else {
             this.parent.log.debug(`Reconfiguring existing Accesory ${configuredAcc.displayName} (${configuredAcc.UUID})`)
-            accessoryServices.services.map((sData: ServiceDescription) => self._serviceCreator(sData, configuredAcc))
+            const services = accessoryServices.services.map((sData: ServiceDescription) => self._serviceCreator(sData, configuredAcc))
+            console.log('-----------------------')
+            console.log(accessoryServices.services)
             this.addAditionalServices(accessoryServices, configuredAcc)
 
             configuredAcc._wasUsed = true

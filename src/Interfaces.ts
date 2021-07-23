@@ -85,8 +85,11 @@ export interface AcceessoryDescription {
 }
 
 export interface ServiceDescription {
-    create?: WithUUID<new () => Service>
+    create?: WithUUID<new (displayName: string | undefined, subtype?: string) => Service>
     uname: string
+    iid: number
+    uuid: string
+    displayName?: string
     characteristics: CharacteristicDescription[]
     source: HttpClientService
 }
