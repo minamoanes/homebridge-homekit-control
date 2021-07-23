@@ -350,14 +350,15 @@ export class HKClient implements IHKClient {
             }
         })
     }
-    private _serviceCreator(sData: ServiceDescription, accessory: PlatformAccessory) {
+    private _serviceCreator(sData: ServiceDescription, accessory: PlatformAccessory, allServices: ServiceDescription[]) {
         if (sData.create) {
+            const hasSameService = allServices.filter((s) => s.uuid === sData.uuid).length > 1
             const subtype = sData.displayName !== undefined ? sData.displayName : `${sData.iid}`
             const serviceGeneral: Service | undefined = accessory.getService(sData.create as any)
 
             //this method does some strange compating (uuid with displayname), better implement our own search...
             //let service: Service | undefined = accessory.getServiceById(sData.uuid, subtype)
-            let service: Service | undefined = accessory.services.find((s) => s.UUID === sData.uuid && s.subtype === subtype)
+            let service: Service | undefined = hasSameService ? accessory.services.find((s) => s.UUID === sData.uuid && s.subtype === subtype) : serviceGeneral
 
             //console.log(serviceGeneral !== undefined, service !== undefined)
             //some services are predefined without an iid, so we keep them
@@ -400,7 +401,7 @@ export class HKClient implements IHKClient {
             // create a new accessory
             const accessory = new this.parent.api.platformAccessory(this.name, this.uuid)
             this.parent.log.debug(`Building new Accessory ${accessory.displayName} (${accessory.UUID})`)
-            accessoryServices.services.map((sData: ServiceDescription) => self._serviceCreator(sData, accessory))
+            accessoryServices.services.map((sData: ServiceDescription) => self._serviceCreator(sData, accessory, accessoryServices.services))
             //console.log(accessoryServices.services)
             this.addAditionalServices(accessoryServices, accessory)
 
@@ -408,7 +409,7 @@ export class HKClient implements IHKClient {
             this.parent.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory])
         } else {
             this.parent.log.debug(`Reconfiguring existing Accesory ${configuredAcc.displayName} (${configuredAcc.UUID})`)
-            const services = accessoryServices.services.map((sData: ServiceDescription) => self._serviceCreator(sData, configuredAcc))
+            const services = accessoryServices.services.map((sData: ServiceDescription) => self._serviceCreator(sData, configuredAcc, accessoryServices.services))
             //console.log('-----------------------')
             //console.log(accessoryServices.services)
             this.addAditionalServices(accessoryServices, configuredAcc)
