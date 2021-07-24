@@ -212,7 +212,7 @@ export class HKClient implements IHKClient {
                     const cl = this.parent.supported.classForService(s.type, this.serviceConfig.proxyAll ? s : undefined)
                     const sRes: ServiceDescription = {
                         create: cl,
-                        uuid: cl.UUID,
+                        uuid: cl !== undefined ? cl.UUID : s.type,
                         displayName: displayName,
                         uname: `${this.uuid}.${acc.aid}.${s.iid}`,
                         iid: s.iid,
@@ -221,7 +221,7 @@ export class HKClient implements IHKClient {
                                 const ccl = this.parent.supported.classForChar(c.type, this.serviceConfig.proxyAll ? c : undefined)
                                 const cRes: CharacteristicDescription = {
                                     create: ccl,
-                                    uuid: ccl.UUID,
+                                    uuid: ccl !== undefined ? ccl.UUID : c.type,
                                     iid: c.iid === undefined ? 0 : c.iid,
                                     uname: `${this.uuid}.${acc.aid}.${s.iid}.${c.iid}`,
                                     cname: `${acc.aid}.${c.iid}`,
@@ -438,7 +438,7 @@ export class HKClient implements IHKClient {
                     })
                 }
 
-                if (c.allowValueUpdates && c.source.perms && c.source.perms.indexOf('ev') >= 0 && c.source.ev) {
+                if (c.allowValueUpdates && c.source.perms && c.source.perms.indexOf('ev') >= 0 && (c.source.ev === undefined || c.source.ev)) {
                     const cl = this.con()
                     cl.on(c, (data) => {
                         if (data.value !== undefined && data.value !== null) {
@@ -499,7 +499,8 @@ export class HKClient implements IHKClient {
             if (service === undefined) {
                 let newService = new sData.create(sData.displayName, subtype)
                 if (newService.UUID !== sData.uuid) {
-                    newService = new sData.create(undefined, undefined)
+                    console.log(`nuuid=${newService.UUID}, uuid=${sData.uuid}`)
+                    newService = new sData.create(sData.displayName, sData.uuid)
                 }
 
                 this.parent.log.debug(`NEW SERVICE, uuid=${sData.uuid} nuuid=${newService.UUID}, st=${subtype}, nst=${newService.subtype}, niid=${newService.iid}, dn=${newService.displayName}`)
