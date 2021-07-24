@@ -34,7 +34,7 @@ if (options.help !== undefined) {
     process.exit(0)
 }
 
-(async () => {
+;(async () => {
     const { IPDiscovery, HttpClient } = require('hap-controller')
 
     const fs = require('fs')
@@ -114,7 +114,7 @@ if (options.help !== undefined) {
             })
             console.clear()
             rl.question(`Enter PIN for ${service.name} (XXX-XX-XXX or XXXX-XXXX or XXXXXXXX): `, async function (pin) {
-                const pinex = /(\d{3})-(\d{2})-(\d{3})|(\d{4})-(\d{4})/
+                const pinex = /(\d{3})-(\d{2})-(\d{3})|(\d{4})-(\d{4})|(\d{8})/
                 let m = ((pin || '').match(pinex) || []).filter((e) => e !== undefined)
                 if (m.length == 4) {
                     pin = m[0]
@@ -122,7 +122,7 @@ if (options.help !== undefined) {
                     const p = m[1] + m[2]
                     pin = p.substr(0, 3) + '-' + p.substr(3, 2) + '-' + p.substr(5, 3)
                 } else if (m.length == 2) {
-                    const p = m[1]
+                    const p = m[0]
                     pin = p.substr(0, 3) + '-' + p.substr(3, 2) + '-' + p.substr(5, 3)
                 } else {
                     reject('Invalid Pin: ', pin)
