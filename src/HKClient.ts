@@ -149,6 +149,13 @@ export class HKClient implements IHKClient {
         }
     }
 
+    shutdown() {
+        this.parent.log.info(`Shuttding down ${this.name}`)
+        try {
+            this.con().unsubscribeAll()
+        } catch (e) {}
+    }
+
     async _preloadValues(data: Accessories) {
         const list = data.accessories
             .map((a) => {

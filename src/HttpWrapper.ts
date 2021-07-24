@@ -114,12 +114,13 @@ export class HttpWrapper {
     public readonly client: HttpClient
     private readonly list: Sequencer
     private readonly log: Logging
+    private unsubscribeFrom: string[]
 
     constructor(log: Logging, deviceId: string, address: string, port: number, pairingData?: PairingData) {
         this.log = log
         this.list = new Sequencer(log)
         this.client = new HttpClient(deviceId, address, port, pairingData)
-
+        this.unsubscribeFrom = []
         this.client.on('event', this.onEvent.bind(this))
     }
 
@@ -176,6 +177,7 @@ export class HttpWrapper {
 
     public subscribeCharacteristics(characteristics: string[]): Promise<HttpConnection> {
         const self = this
+        this.unsubscribeFrom = this.unsubscribeFrom.concat(characteristics).filter((c, i, a) => a.indexOf(c) === i)
         return self.list.push(
             () => {
                 this.log.debug('Running Subscribe task', characteristics.join(', '))
@@ -198,6 +200,10 @@ export class HttpWrapper {
                     l.listener(cc)
                 })
         })
+    }
+
+    public unsubscribeAll() {
+        return this.client.subscribeCharacteristics(this.unsubscribeFrom)
     }
 
     private readonly listeners: EventItems[] = []
