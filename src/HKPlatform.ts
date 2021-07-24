@@ -15,8 +15,8 @@ export class HKPlatform implements IndependentPlatformPlugin, IHKPlatform {
     readonly supported: SupportedServices
 
     constructor(log: Logging, config: PlatformConfig, api: API) {
-        api.on('shutdown', () => {
-            this.shutdownClients()
+        api.on('shutdown', async () => {
+            await this.shutdownClients()
         })
         process.on('exit', () => {
             this.log('goodbye')
@@ -70,7 +70,7 @@ export class HKPlatform implements IndependentPlatformPlugin, IHKPlatform {
         }
     }
 
-    shutdownClients() {
+    async shutdownClients() {
         this.clients.forEach((c) => c.shutdown())
     }
 }
