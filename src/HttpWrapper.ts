@@ -149,6 +149,11 @@ export class HttpWrapper {
         const self = this
         return self.list.push(
             () => {
+                if (characteristics.length === 0) {
+                    return new Promise((resolve) => {
+                        resolve({})
+                    })
+                }
                 return self.client.getCharacteristics(characteristics, options)
             },
             'getCharacteristics',

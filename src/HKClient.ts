@@ -166,28 +166,30 @@ export class HKClient implements IHKClient {
             })
             .flat(2)
         const chars = list.map((c: any) => c.cname)
-        const inData: any = await this.con().getCharacteristics(chars, {
-            meta: false,
-            perms: false,
-            type: false,
-            ev: false,
-        })
+        if (chars.length > 0) {
+            const inData: any = await this.con().getCharacteristics(chars, {
+                meta: false,
+                perms: false,
+                type: false,
+                ev: false,
+            })
 
-        //console.log(inData)
-        const newValues = inData.characteristics.filter((d) => d.value !== undefined && d.value != null)
-        this.parent.log.debug('Preloaded Values')
-        this.parent.log.debug(newValues)
+            //console.log(inData)
+            const newValues = inData.characteristics.filter((d) => d.value !== undefined && d.value != null)
+            this.parent.log.debug('Preloaded Values')
+            this.parent.log.debug(newValues)
 
-        data.accessories.forEach((a) =>
-            a.services.forEach((s) =>
-                s.characteristics.forEach((c: HttpClientCharacteristic) => {
-                    const val = newValues.find((v) => v.aid == a.aid && c.iid == v.iid)
-                    if (val !== undefined) {
-                        c.value = val.value
-                    }
-                })
+            data.accessories.forEach((a) =>
+                a.services.forEach((s) =>
+                    s.characteristics.forEach((c: HttpClientCharacteristic) => {
+                        const val = newValues.find((v) => v.aid == a.aid && c.iid == v.iid)
+                        if (val !== undefined) {
+                            c.value = val.value
+                        }
+                    })
+                )
             )
-        )
+        }
     }
 
     _loadDevices(data: Accessories) {
