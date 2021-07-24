@@ -150,12 +150,13 @@ export class HKClient implements IHKClient {
     }
 
     shutdown() {
-        this.parent.log.info(`Shuttding down ${this.name}`)
+        this.parent.log.info(`Shuttding down '${this.name}'`)
         try {
             this.con().unsubscribeAll()
         } catch (e) {
             this.parent.log.debug('Error on shutdown:', e)
         }
+        this.parent.log.info(`Shuttdown of '${this.name}' finished`)
     }
 
     async _preloadValues(data: Accessories) {
