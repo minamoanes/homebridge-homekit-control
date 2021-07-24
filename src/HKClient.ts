@@ -152,7 +152,11 @@ export class HKClient implements IHKClient {
     shutdown() {
         this.parent.log.info(`Shuttding down '${this.name}'`)
         try {
-            this.con().unsubscribeAll()
+            this.con()
+                .unsubscribeAll()
+                .then(() => {
+                    this.parent.log.debug(`Unsubscribe finished on '${this.name}'`)
+                })
         } catch (e) {
             this.parent.log.debug('Error on shutdown:', e)
         }
