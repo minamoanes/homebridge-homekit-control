@@ -53,7 +53,7 @@ homekitPair
 or
 
 ```
-homekitPair wlan0
+homekitPair -i wlan0
 ```
 
 - Select device, and enter code to pair (including `-`, example `123-45-678`)
