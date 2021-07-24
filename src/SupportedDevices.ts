@@ -587,7 +587,7 @@ export class SupportedServices {
             maxValue: source.maxValue,
             minStep: source.minStep,
             maxLen: source.maxLen,
-            maxDataLen: source.maxDataLen,
+            maxDataLen: source.format === Formats.DATA ? undefined : source.maxDataLen,
             validValues: source.validValues,
             validValueRanges: source.validValueRanges,
             adminOnlyAccess: source.adminOnlyAccess,
