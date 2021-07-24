@@ -203,7 +203,10 @@ export class HttpWrapper {
     }
 
     public unsubscribeAll() {
-        return this.client.subscribeCharacteristics(this.unsubscribeFrom)
+        this.log.debug('Unsubscribing from:', this.unsubscribeFrom)
+        const res = this.client.subscribeCharacteristics(this.unsubscribeFrom)
+        this.unsubscribeFrom = []
+        return res
     }
 
     private readonly listeners: EventItems[] = []
