@@ -9,6 +9,7 @@ old
 
 # eslint
 .eslintrc
+.eslintrc.js
 
 # typescript
 tsconfig.json

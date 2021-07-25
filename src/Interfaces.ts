@@ -14,11 +14,13 @@ export interface HKServiceConfig {
     uniquePrefix?: string
     enableHistory?: boolean
     historyInterval?: number
+    logFoundServices?: boolean
     name?: string
     id: string
     address: string
     port: number
     pairingData: PairingData
+    proxyAll?: boolean
 }
 export interface HKPlatformConfig extends PlatformConfig {
     services: HKServiceConfig[]
@@ -42,6 +44,7 @@ export interface HKPlatformAccessory extends PlatformAccessory {
 
 export interface ExtendedCharacteristic extends Characteristic {
     chain?: Characteristic
+    hasOnGet?: boolean
     chainValue?: () => any
 }
 
@@ -49,6 +52,8 @@ export interface CharacteristicDescription {
     create?: WithUUID<new () => Characteristic>
     uname: string
     cname: string
+    uuid: string
+    iid: number
     value?: any
     source: HttpClientCharacteristic
     allowValueUpdates: boolean
@@ -83,8 +88,11 @@ export interface AcceessoryDescription {
 }
 
 export interface ServiceDescription {
-    create?: WithUUID<new () => Service>
+    create?: WithUUID<new (displayName: string | undefined, subtype?: string) => Service>
     uname: string
+    iid: number
+    uuid: string
+    displayName?: string
     characteristics: CharacteristicDescription[]
     source: HttpClientService
 }
