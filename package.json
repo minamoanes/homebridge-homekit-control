@@ -1,8 +1,8 @@
 {
-    "name": "homebridge-homekit-proxy",
+    "name": "homebridge-homekit-control",
     "repository": {
         "type": "git",
-        "url": "git+ssh://git@github.com:quiqueck/homebridge-homekit-proxy.git"
+        "url": "git+ssh://git@github.com:minamoanes/homebridge-homekit-control.git"
     },
     "version": "0.1.19",
     "bin": {
@@ -21,9 +21,9 @@
     "author": "F. Bauer",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/quiqueck/homebridge-homekit-proxy/issues"
+        "url": "https://github.com/minamoanes/homebridge-homekit-control/issues"
     },
-    "homepage": "https://github.com/quiqueck/homebridge-homekit-proxy#readme",
+    "homepage": "https://github.com/minamoanes/homebridge-homekit-control#readme",
     "keywords": [
         "homebridge-plugin",
         "homebridge",
