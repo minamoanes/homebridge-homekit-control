@@ -13,7 +13,8 @@ import {
     ServiceDescription,
 } from './Interfaces'
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings'
-import { Accessories } from 'hap-controller/lib/transport/ble/gatt-client'
+import { Accessories } from 'hap-controller/lib/model/accessory'
+import { CharacteristicObject } from 'hap-controller/lib/model/characteristic'
 import { HttpWrapper } from './HttpWrapper'
 
 interface FakeGatoData {
@@ -165,8 +166,8 @@ export class HKClient implements IHKClient {
             .map((a) => {
                 return a.services.map((s) => {
                     const r = s.characteristics
-                        .filter((c: HttpClientCharacteristic) => c.value === null)
-                        .map((c: HttpClientCharacteristic) => {
+                        .filter((c: CharacteristicObject) => c.value === null)
+                        .map((c: CharacteristicObject) => {
                             const cany = c as any
                             cany.cname = `${a.aid}.${c.iid}`
                             cany.hadResonse = false
@@ -192,7 +193,7 @@ export class HKClient implements IHKClient {
 
             data.accessories.forEach((a) =>
                 a.services.forEach((s) =>
-                    s.characteristics.forEach((c: HttpClientCharacteristic) => {
+                    s.characteristics.forEach((c: CharacteristicObject) => {
                         const val = newValues.find((v) => v.aid == a.aid && c.iid == v.iid)
                         if (val !== undefined) {
                             c.value = val.value
@@ -204,7 +205,7 @@ export class HKClient implements IHKClient {
     }
 
     _loadDevices(data: Accessories) {
-        this.supportedAccessories = data.accessories.map((acc: HttpClientAccesory) => {
+        this.supportedAccessories = data.accessories.map((acc: any) => {
             const aRes: AcceessoryDescription = {
                 fakeGato: {
                     room: {},
@@ -521,7 +522,7 @@ export class HKClient implements IHKClient {
                     service = accessory.addService(newService)
                 } catch (e) {
                     this.parent.log.error(`Unable to add new version of service UUID=${newService.UUID}, subtype=${subtype}`)
-                    this.parent.log.error(e)
+                    this.parent.log.error(e as string)
                 }
             } else {
                 //this.parent.log.debug(`REUSING SERVICE', uuid=${service.UUID}, st=${subtype}, nst=${service.subtype}, niid=${service.iid}, iid=${sData.iid}`)
@@ -552,7 +553,7 @@ export class HKClient implements IHKClient {
             try {
                 this.parent.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory])
             } catch (e) {
-                this.parent.log.error(e)
+                this.parent.log.error(e as string)
             }
         } else {
             this.parent.log.debug(`Reconfiguring existing Accesory ${configuredAcc.displayName} (${configuredAcc.UUID})`)
