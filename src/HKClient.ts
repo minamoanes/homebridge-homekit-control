@@ -5,7 +5,6 @@ import {
     ExtendedCharacteristic,
     FakeGatoProvider,
     HKServiceConfig,
-    HttpClientAccesory,
     HttpClientCharacteristic,
     HttpClientService,
     IHKClient,
