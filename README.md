@@ -2,14 +2,16 @@
 
 # Homebridge HomeKit Control
 
-<a href="https://www.npmjs.com/package/homebridge-homekit-proxy"><img title="npm version" src="https://badgen.net/npm/v/homebridge-homekit-proxy?label=stable"></a>
-<a href="https://www.npmjs.com/package/homebridge-homekit-proxy"><img title="npm version" src="https://badgen.net/npm/v/homebridge-homekit-proxy/beta?label=beta"></a>
-<a href="https://www.npmjs.com/package/homebridge-homekit-proxy"><img title="npm downloads" src="https://badgen.net/npm/dt/homebridge-homekit-proxy"></a>
+<a href="https://www.npmjs.com/package/homebridge-homekit-control"><img title="npm version" src="https://badgen.net/npm/v/homebridge-homekit-control?label=stable"></a>
+
+<!-- <a href="https://www.npmjs.com/package/homebridge-homekit-control"><img title="npm version" src="https://badgen.net/npm/v/homebridge-homekit-control/beta?label=beta"></a> -->
+
+<a href="https://www.npmjs.com/package/homebridge-homekit-control"><img title="npm downloads" src="https://badgen.net/npm/dt/homebridge-homekit-control"></a>
 
 </span>
 
 **HomeKit Control**
-Forked from: https://github.com/quiqueck/homebridge-homekit-proxy
+Forked from: https://github.com/quiqueck/homebridge-homekit-control
 
 allows you to control HomeKit enabled WLAN-Devices from HomeBridge. This is especially usefull if you want to allow Android/Linux or Windows users to access HomeKit-Exclusive devices. This is an almost complete rewrite of the original homebridge-homekit-controller by MartinPham.
 
@@ -34,13 +36,7 @@ All supported sensors on any configured device are automatically dicovered and a
 ## Install
 
 ```
-sudo npm i -g homebridge-homekit-proxy
-```
-
-or if you'd like to run the beta versions, you can use
-
-```
-sudo npm install -g homebridge-homekit-proxy@beta
+sudo npm i -g homebridge-homekit-control
 ```
 
 ## Pair devices
