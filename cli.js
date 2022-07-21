@@ -130,8 +130,11 @@ if (options.help !== undefined) {
                 console.log(`Pin: ${pin}`)
                 rl.close()
 
+                const discovery = new IPDiscovery()
+                const pairMethod = await discovery.getPairMethod(service)
                 const ipClient = new HttpClient(service.id, service.address, service.port)
-                await ipClient.pairSetup(pin)
+
+                await ipClient.pairSetup(pin, pairMethod)
                 resolve(ipClient)
             })
         })
