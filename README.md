@@ -1,19 +1,24 @@
-<span align="center">
+<div align="center">
+
+<img src="https://developer.apple.com/assets/elements/icons/homekit/homekit-96x96_2x.png" width="100px" />
+<img src="https://cdn-icons-png.flaticon.com/512/1294/1294463.png" width="50px" />
+<img src="https://raw.githubusercontent.com/homebridge/branding/master/logos/homebridge-color-round-stylized.png" width="100px" />
+
 
 # Homebridge HomeKit Control
 
 <a href="https://www.npmjs.com/package/homebridge-homekit-control"><img title="npm version" src="https://badgen.net/npm/v/homebridge-homekit-control?label=stable"></a>
-
-<!-- <a href="https://www.npmjs.com/package/homebridge-homekit-control"><img title="npm version" src="https://badgen.net/npm/v/homebridge-homekit-control/beta?label=beta"></a> -->
-
 <a href="https://www.npmjs.com/package/homebridge-homekit-control"><img title="npm downloads" src="https://badgen.net/npm/dt/homebridge-homekit-control"></a>
 
-</span>
+</div>
 
-**HomeKit Control**
-Forked from: https://github.com/quiqueck/homebridge-homekit-control
+**HomeKit Control** allows you to control HomeKit enabled devices from Homebridge.
 
-allows you to control HomeKit enabled WLAN-Devices from HomeBridge. This is especially usefull if you want to allow Android/Linux or Windows users to access HomeKit-Exclusive devices. This is an almost complete rewrite of the original homebridge-homekit-controller by MartinPham.
+This is especially usefull if you want to control HomeKit Exclusive devices and accessories through:
+- <img src="https://user-images.githubusercontent.com/17292320/180973891-14c38bef-4a17-4733-b103-3cf002755b69.png" width="20" /> **Google Assistant** (using `homebridge-gsh` plugin)
+- <img src="https://user-images.githubusercontent.com/17292320/180974563-0fd9a3d9-6f4f-4d57-a7c2-9e61aea04903.png" width="20" /> **Amazon Alexa** (using `homebridge-alexa` plugin)
+- and of course still controllable from <img src="https://user-images.githubusercontent.com/17292320/180978863-c58e839b-4d31-4860-8235-b69991767460.png" width="20" /> **Apple HomeKit** though Homebridge.
+
 
 The Plugin currently supports the following Services provided by **WLAN**-based HomeKit enabled devices:
 
@@ -44,7 +49,7 @@ sudo npm i -g homebridge-homekit-control
 ### Discover Devices
 
 ```
-homekitPair [network interface]
+homekitPair [network] [interface]
 ```
 
 #### Example
@@ -123,13 +128,16 @@ Here are some additional configuration parameters, not obtained by the Device Pa
 }
 ```
 
-## Building
+## How to fix Known Errors:
 
-The project was converted to the build system from https://github.com/homebridge/homebridge-plugin-template. Visual Studio Code is set up to lint on save.
+**if you get the error `M2: Error: 6`:**
 
-Using `npm run dev` will launch the develop environment, where your code is automatically compiled on save and the local homebridge server is automatically restarted.
-
-The command `npm rund build` will trigger the compilation of your project manually.
+1. Add the device to your Homekit
+2. Once the device is added and connected to your Wifi network
+3. Remove device from your Home
+4. Device should still be connected to your Wifi (check it from your router's connected clients)
+5. Run the `homekitPair` command in your Homebridge and enter the pin
+6. And voila, you get the JSON
 
 ## Tested Accesories
 
@@ -142,3 +150,11 @@ The command `npm rund build` will trigger the compilation of your project manual
   - Gardena Smart Sensor II
 
 Please let me know if you use this plugin and got it to work with a new HomeKit-Accesory that is not listed above
+
+## Building for developers
+
+The project was converted to the build system from https://github.com/homebridge/homebridge-plugin-template. Visual Studio Code is set up to lint on save.
+
+Using `npm run dev` will launch the develop environment, where your code is automatically compiled on save and the local homebridge server is automatically restarted.
+
+The command `npm rund build` will trigger the compilation of your project manually.
