@@ -9,6 +9,7 @@
 
 <a href="https://www.npmjs.com/package/homebridge-homekit-control"><img title="npm version" src="https://badgen.net/npm/v/homebridge-homekit-control?label=stable"></a>
 <a href="https://www.npmjs.com/package/homebridge-homekit-control"><img title="npm downloads" src="https://badgen.net/npm/dt/homebridge-homekit-control"></a>
+[![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/MinaMoanes)
 
