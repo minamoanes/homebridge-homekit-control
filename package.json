@@ -1,10 +1,11 @@
 {
     "name": "homebridge-homekit-control",
+    "alias": "HomekitControl",
     "repository": {
         "type": "git",
         "url": "git+ssh://git@github.com:minamoanes/homebridge-homekit-control.git"
     },
-    "version": "0.1.23",
+    "version": "0.1.24",
     "bin": {
         "homekitPair": "./cli.js"
     },
@@ -17,8 +18,8 @@
         "gobeta": "npm version prepatch --preid beta && npm publish --tag=beta",
         "prepublishOnly": "npm run lint && npm run build"
     },
-    "description": "Homebridge Homekit Proxy allows you to control HomeKit-enabled Devices directly from within HomeBridege. (Based on homebridge-homekit-controller by MartinPham)",
-    "author": "F. Bauer",
+    "description": "Homebridge Homekit Control allows you to control HomeKit-enabled Devices directly from within HomeBridege. (Based on previous versions develped by MartinPham and frank.bauer)",
+    "author": "minamoanes",
     "license": "MIT",
     "bugs": {
         "url": "https://github.com/minamoanes/homebridge-homekit-control/issues"
@@ -27,6 +28,9 @@
     "keywords": [
         "homebridge-plugin",
         "homebridge",
+        "homekit-control",
+        "proxy",
+        "control",
         "api",
         "homekit",
         "fakegato"
@@ -34,6 +38,10 @@
     "engines": {
         "homebridge": "^1.5.1",
         "node": "^14.20.1 || ^16.17.1 || ^18.12.0"
+    },
+    "funding": {
+        "type": "paypal",
+        "url": "https://paypal.me/MinaMoanes"
     },
     "dependencies": {
         "cli-progress": "^3.11.2",

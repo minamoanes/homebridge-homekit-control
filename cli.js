@@ -34,7 +34,7 @@ if (options.help !== undefined) {
     process.exit(0)
 }
 
-(async () => {
+;(async () => {
     const { IPDiscovery, HttpClient } = require('hap-controller')
 
     const fs = require('fs')
