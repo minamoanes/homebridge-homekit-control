@@ -4,7 +4,7 @@
         "type": "git",
         "url": "git+ssh://git@github.com:minamoanes/homebridge-homekit-control.git"
     },
-    "version": "0.1.21",
+    "version": "0.1.23",
     "bin": {
         "homekitPair": "./cli.js"
     },
@@ -32,8 +32,8 @@
         "fakegato"
     ],
     "engines": {
-        "homebridge": "^1.5.0",
-        "node": "^14.20.1 || ^16.17.1 || ^18.9.1"
+        "homebridge": "^1.5.1",
+        "node": "^14.20.1 || ^16.17.1 || ^18.12.0"
     },
     "dependencies": {
         "cli-progress": "^3.11.2",

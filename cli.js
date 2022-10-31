@@ -34,7 +34,7 @@ if (options.help !== undefined) {
     process.exit(0)
 }
 
-(async () => {
+;(async () => {
     const { IPDiscovery, HttpClient } = require('hap-controller')
 
     const fs = require('fs')
@@ -134,11 +134,16 @@ if (options.help !== undefined) {
                 const pairMethod = await discovery.getPairMethod(service)
                 const ipClient = new HttpClient(service.id, service.address, service.port)
 
+                ipClient.setCharacteristics({
+                    '2.10': true,
+                    iid: service.id,
+                })
+
                 try {
                     await ipClient.pairSetup(pin, pairMethod)
                     resolve(ipClient)
                 } catch (error) {
-                    if (error.includes('M2: Error: 6')) {
+                    if (error?.name.includes('M2: Error: 6')) {
                         console.log('Check how to fix (M2 Error 6) here: https://github.com/minamoanes/homebridge-homekit-control#how-to-fix-known-errors')
                     }
                     reject(`${error} \n \n For further support check here: https://github.com/minamoanes/homebridge-homekit-control`)
@@ -158,7 +163,7 @@ if (options.help !== undefined) {
                 output: process.stdout,
             })
 
-            rl.question(`Enter service data file name for saving: `, async function (file) {
+            rl.question(`Enter service data file name for saving: `, async (file) => {
                 console.log('Creating file:', file)
                 const accessories = await client.getAccessories()
                 const data = {
