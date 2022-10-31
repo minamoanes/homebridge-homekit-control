@@ -34,7 +34,7 @@ if (options.help !== undefined) {
     process.exit(0)
 }
 
-;(async () => {
+(async () => {
     const { IPDiscovery, HttpClient } = require('hap-controller')
 
     const fs = require('fs')
@@ -42,8 +42,8 @@ if (options.help !== undefined) {
     const discover = () =>
         new Promise((resolve, reject) => {
             console.clear()
-            console.log('Homkit Device Discovery')
-            console.log('-----------------------\n\n')
+            console.log('HomekitControl Device Discovery')
+            console.log('-------------------------------\n\n')
             //term.clear()
             const ipDiscovery = new IPDiscovery(options.interface)
             const discoveryTimeout = options.discoverTime
@@ -54,7 +54,7 @@ if (options.help !== undefined) {
             ipDiscovery.start()
 
             let discoveryTime = 0
-            const progressBar = new cliProgress.SingleBar({ format: 'Discovering services | {bar} | {percentage}% | ETA: {eta}s', hideCursor: false }, cliProgress.Presets.rect)
+            const progressBar = new cliProgress.SingleBar({ format: 'Discovering Homekit Accessories | {bar} | {percentage}% | ETA: {eta}s', hideCursor: false }, cliProgress.Presets.rect)
 
             progressBar.start(100, 0)
 
@@ -106,6 +106,17 @@ if (options.help !== undefined) {
         process.exit(0)
     }
 
+    const errorCallback = (error) => {
+        console.log('\n\n-------------------------------\n')
+        console.log(`\u274C ${error?.message}`)
+        if (error?.message?.includes('M2: Error: 6')) {
+            console.error('=> Check how to fix the (M2: Error 6) here:\n  https://github.com/minamoanes/homebridge-homekit-control#how-to-fix-known-errors')
+        } else {
+            console.error(`=> For further support check here:\n  https://github.com/minamoanes/homebridge-homekit-control`)
+        }
+        console.log('\n-------------------------------\n\n')
+    }
+
     const pairService = (service) =>
         new Promise((resolve, reject) => {
             const rl = readline.createInterface({
@@ -143,10 +154,7 @@ if (options.help !== undefined) {
                     await ipClient.pairSetup(pin, pairMethod)
                     resolve(ipClient)
                 } catch (error) {
-                    if (error?.name.includes('M2: Error: 6')) {
-                        console.log('Check how to fix (M2 Error 6) here: https://github.com/minamoanes/homebridge-homekit-control#how-to-fix-known-errors')
-                    }
-                    reject(`${error} \n \n For further support check here: https://github.com/minamoanes/homebridge-homekit-control`)
+                    errorCallback(error)
                 }
             })
         })
@@ -210,130 +218,4 @@ if (options.help !== undefined) {
     console.log('Paired with Service:')
     console.log(data)
     process.exit()
-
-    // const dataFile = 'data.json';
-    // const serviceId = '07:04:16:30:05:14';
-    // const servicePin = '151-21-988';
-
-    // let data = {};
-    // /*
-    //     [id] => {
-    //         address,
-    //         port,
-    //         pairingData,
-    //         accessories
-    //     }
-    // */
-    // if(fs.existsSync(dataFile))
-    // {
-    //     data = JSON.parse(fs.readFileSync(dataFile));
-    //     const serviceData = data[serviceId];
-
-    //     const ipClient = new HttpClient(
-    //         serviceId,
-    //         serviceData.address,
-    //         serviceData.port,
-    //         serviceData.pairingData
-    //     );
-
-    //     ipClient.getAccessories().then((accessories) => {
-    //         console.log('Got accessories -> try persit data');
-    //         data[serviceId].accessories = accessories;
-    //         console.log(accessories);
-
-    //         fs.writeFileSync(dataFile, JSON.stringify(data));
-
-    //         console.log('OK');
-    //         process.exit();
-    //     }).catch((e) => console.error('getAccessories e', e));
-
-    //     /*
-    //     data = JSON.parse(fs.readFileSync(dataFile));
-
-    //     console.log('Try connect ' + serviceId);
-    //     const serviceData = data[serviceId];
-
-    //     console.log({
-    //         id: serviceId,
-    //         address: serviceData.address,
-    //         port: serviceData.port,
-    //         pairingData: serviceData.pairingData
-    //     })
-
-    //     const ipSubscriberClient = new HttpClient(
-    //         serviceId,
-    //         serviceData.address,
-    //         serviceData.port,
-    //         serviceData.pairingData
-    //     );
-
-    //     ipSubscriberClient.on('event', (ev) => {
-    //         console.log('[event]', ev);
-    //     });
-
-    //     ipSubscriberClient.subscribeCharacteristics(['2.10']).then((conn) => {
-    //         connection = conn;
-    //     }).catch((e) => console.error('subscribeCharacteristics', e));
-
-    //     const ipClient = new HttpClient(
-    //         serviceId,
-    //         serviceData.address,
-    //         serviceData.port,
-    //         serviceData.pairingData
-    //     );
-    //     ipClient.setCharacteristics({
-    //         '2.10': true
-    //     }).then(() => {
-    //         ipClient.getCharacteristics(
-    //             ['2.10'],
-    //             {
-    //               meta: true,
-    //               perms: true,
-    //               type: true,
-    //               ev: true,
-    //             }
-    //         ).then((characteristics) => {
-    //             console.log(characteristics);
-    //         }).catch((e) => console.error('getCharacteristics', e));
-    //     }).catch((e) => console.error('setCharacteristics', e));
-
-    //     */
-    // } else {
-    //     console.log('No data -> try discover');
-    //     const ipDiscovery = new IPDiscovery();
-    //     ipDiscovery.on('serviceUp', (service) => {
-    //         console.log('Discovered ' + service.id + ' -> try pair');
-
-    //         data[service.id] = {
-    //             address: service.address,
-    //             port: service.port,
-    //             pairingData: {},
-    //             accessories: {}
-    //         };
-
-    //         const ipClient = new HttpClient(service.id, service.address, service.port);
-
-    //         ipClient.pairSetup(servicePin).then((r) => {
-
-    //             const pairingData = ipClient.getLongTermData();
-    //             console.log('pairingData', pairingData);
-    //             console.log('Paired ' + service.id + ' -> try get accessories');
-
-    //             data[service.id].pairingData = pairingData;
-
-    //             ipClient.getAccessories().then((accessories) => {
-    //                 console.log('Got ' + service.id + ' accessories -> try persit data');
-    //                 console.log(accessories);
-    //                 data[service.id].accessories = accessories;
-
-    //                 fs.writeFileSync(dataFile, JSON.stringify(data));
-
-    //                 console.log('OK');
-    //                 process.exit();
-    //             }).catch((e) => console.error('getAccessories', e));
-
-    //         }).catch((e) => console.error('pairSetup', e));
-    //     });
-    //     ipDiscovery.start();
-    // }
 })()
