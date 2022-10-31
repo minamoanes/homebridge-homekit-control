@@ -34,7 +34,7 @@ if (options.help !== undefined) {
     process.exit(0)
 }
 
-;(async () => {
+(async () => {
     const { IPDiscovery, HttpClient } = require('hap-controller')
 
     const fs = require('fs')
@@ -113,7 +113,7 @@ if (options.help !== undefined) {
                 output: process.stdout,
             })
             console.clear()
-            rl.question(`Enter PIN for ${service.name} (XXX-XX-XXX or XXXX-XXXX or XXXXXXXX): `, async function (pin) {
+            rl.question(`Enter PIN for ${service.name} (XXX-XX-XXX or XXXX-XXXX or XXXXXXXX): `, async (pin) => {
                 const pinex = /(\d{3})-(\d{2})-(\d{3})|(\d{4})-(\d{4})|(\d{8})/
                 let m = ((pin || '').match(pinex) || []).filter((e) => e !== undefined)
                 if (m.length == 4) {
@@ -134,8 +134,15 @@ if (options.help !== undefined) {
                 const pairMethod = await discovery.getPairMethod(service)
                 const ipClient = new HttpClient(service.id, service.address, service.port)
 
-                await ipClient.pairSetup(pin, pairMethod)
-                resolve(ipClient)
+                try {
+                    await ipClient.pairSetup(pin, pairMethod)
+                    resolve(ipClient)
+                } catch (error) {
+                    if (error.includes('M2: Error: 6')) {
+                        console.log('Check how to fix (M2 Error 6) here: https://github.com/minamoanes/homebridge-homekit-control#how-to-fix-known-errors')
+                    }
+                    reject(`${error} \n \n For further support check here: https://github.com/minamoanes/homebridge-homekit-control`)
+                }
             })
         })
 
