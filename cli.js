@@ -20,8 +20,7 @@ const optionDefinitions = [
     alias: "i",
     type: String,
     typeLabel: "{underline string}",
-    description:
-      "Name of the network device to listen for HomeKit items. For example: {italic wlan0}",
+    description: "Name of the network device to listen for HomeKit items. For example: {italic wlan0}",
   },
   {
     name: "help",
@@ -36,8 +35,7 @@ if (options.help !== undefined) {
   const sections = [
     {
       header: "HomeKit Device Discovery",
-      content:
-        "Discovers available HomeKit devices on a network, pairs with them and writes the neccesary pairing-information into a file.",
+      content: "Discovers available HomeKit devices on a network, pairs with them and writes the neccesary pairing-information into a file.",
     },
     {
       header: "Options",
@@ -71,8 +69,7 @@ if (options.help !== undefined) {
       let discoveryTime = 0;
       const progressBar = new cliProgress.SingleBar(
         {
-          format:
-            "Discovering Homekit Accessories | {bar} | {percentage}% | ETA: {eta}s",
+          format: "Discovering Homekit Accessories | {bar} | {percentage}% | ETA: {eta}s",
           hideCursor: false,
         },
         cliProgress.Presets.rect
@@ -105,9 +102,7 @@ if (options.help !== undefined) {
       console.log("\n\n");
       console.log("Please select a Device for pairing:");
 
-      const serviceMenuItems = services.map(
-        (service) => `${service.name} (${service.id})`
-      );
+      const serviceMenuItems = services.map((service) => `${service.name} (${service.id})`);
       serviceMenuItems.push("[CANCEL]");
       cliSelect(
         {
@@ -134,13 +129,9 @@ if (options.help !== undefined) {
     console.log("\n\n-------------------------------\n");
     console.log(`\u274C ${error?.message}`);
     if (error?.message?.includes("M2: Error: 6")) {
-      console.error(
-        `\u27A1 Check how to fix the (M2: Error 6) here:\n  https://github.com/minamoanes/homebridge-homekit-control#how-to-fix-known-errors`
-      );
+      console.error(`\u27A1 Check how to fix the (M2: Error 6) here:\n  https://github.com/minamoanes/homebridge-homekit-control#how-to-fix-known-errors`);
     } else if (!error?.message?.includes("Invalid Pin")) {
-      console.error(
-        `\u27A1 For further support check the Repo documentation or open an issue:\n  https://github.com/minamoanes/homebridge-homekit-control`
-      );
+      console.error(`\u27A1 For further support check the Repo documentation or open an issue:\n  https://github.com/minamoanes/homebridge-homekit-control`);
     }
     console.log("\n-------------------------------\n\n");
     process.exit(1);
@@ -155,48 +146,39 @@ if (options.help !== undefined) {
 
       console.clear();
 
-      rl.question(
-        `Enter PIN for ${service.name} (XXX-XX-XXX or XXXX-XXXX or XXXXXXXX): `,
-        async (pin) => {
-          const pinex = /(\d{3})-(\d{2})-(\d{3})|(\d{4})-(\d{4})|(\d{8})/;
+      rl.question(`Enter PIN for ${service.name} (XXX-XX-XXX or XXXX-XXXX or XXXXXXXX): `, async (pin) => {
+        const pinex = /(\d{3})-(\d{2})-(\d{3})|(\d{4})-(\d{4})|(\d{8})/;
 
-          const m = ((pin || "").match(pinex) || []).filter(
-            (e) => e !== undefined
-          );
+        const m = ((pin || "").match(pinex) || []).filter((e) => e !== undefined);
 
-          if (m.length === 4) {
-            pin = m[0];
-          } else if (m.length === 3 || m.length === 2) {
-            const p = m.length === 3 ? m[1] + m[2] : m[0];
-            pin = [p.slice(0, 3), p.slice(3, 5), p.slice(5, 8)].join("-");
-          } else {
-            return errorCallback(new Error("Invalid Pin: " + pin));
-          }
-
-          console.log(`Pin: ${pin}`);
-          rl.close();
-
-          try {
-            const discovery = new IPDiscovery();
-            const pairMethod = await discovery.getPairMethod(service);
-            const ipClient = new HttpClient(
-              service.id,
-              service.address,
-              service.port
-            );
-
-            ipClient.setCharacteristics({
-              "2.10": true,
-              iid: service.id,
-            });
-
-            await ipClient.pairSetup(pin, pairMethod);
-            return resolve(ipClient);
-          } catch (error) {
-            return errorCallback(error);
-          }
+        if (m.length === 4) {
+          pin = m[0];
+        } else if (m.length === 3 || m.length === 2) {
+          const p = m.length === 3 ? m[1] + m[2] : m[0];
+          pin = [p.slice(0, 3), p.slice(3, 5), p.slice(5, 8)].join("-");
+        } else {
+          return errorCallback(new Error("Invalid Pin: " + pin));
         }
-      );
+
+        console.log(`Pin: ${pin}`);
+        rl.close();
+
+        try {
+          const discovery = new IPDiscovery();
+          const pairMethod = await discovery.getPairMethod(service);
+          const ipClient = new HttpClient(service.id, service.address, service.port);
+
+          ipClient.setCharacteristics({
+            "2.10": true,
+            iid: service.id,
+          });
+
+          await ipClient.pairSetup(pin, pairMethod);
+          return resolve(ipClient);
+        } catch (error) {
+          return errorCallback(error);
+        }
+      });
     });
 
   try {

@@ -1,1 +1,1 @@
-declare module 'fakegato-history'
+declare module "fakegato-history";

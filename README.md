@@ -4,7 +4,6 @@
 <img src="https://cdn-icons-png.flaticon.com/512/1294/1294463.png" width="50px" />
 <img src="https://raw.githubusercontent.com/homebridge/branding/master/logos/homebridge-color-round-stylized.png" width="100px" />
 
-
 # Homebridge HomeKit Control
 
 <a href="https://www.npmjs.com/package/homebridge-homekit-control"><img title="npm version" src="https://badgen.net/npm/v/homebridge-homekit-control?label=stable"></a>
@@ -18,10 +17,10 @@
 **HomeKit Control** allows you to control HomeKit enabled devices from Homebridge.
 
 This is especially usefull if you want to control HomeKit Exclusive devices and accessories through:
+
 - <img src="https://user-images.githubusercontent.com/17292320/180973891-14c38bef-4a17-4733-b103-3cf002755b69.png" width="20" /> **Google Assistant** (using `homebridge-gsh` plugin)
 - <img src="https://user-images.githubusercontent.com/17292320/180974563-0fd9a3d9-6f4f-4d57-a7c2-9e61aea04903.png" width="20" /> **Amazon Alexa** (using `homebridge-alexa` plugin)
 - and of course still controllable from <img src="https://user-images.githubusercontent.com/17292320/180978863-c58e839b-4d31-4860-8235-b69991767460.png" width="20" /> **Apple HomeKit** though Homebridge.
-
 
 The Plugin currently supports the following Services provided by **WLAN**-based HomeKit enabled devices:
 
@@ -39,7 +38,7 @@ The Plugin currently supports the following Services provided by **WLAN**-based 
 
 BLE is currently not supported, as it seems to be unstable when multiple BLE-enabled Plugins are installed.
 
-All supported sensors on any configured device are automatically dicovered and added when HomeBridge starts up.
+All supported sensors on any configured device are automatically dicovered and added when Homebridge starts up.
 
 ## Install
 
