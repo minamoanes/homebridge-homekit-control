@@ -4,7 +4,7 @@ module.exports = {
         node: true,
         browser: true,
     },
-    extends: ['plugin:prettier/recommended', 'eslint:recommended', 'plugin:vue/essential', 'plugin:@typescript-eslint/eslint-recommended'],
+    extends: ['eslint:recommended', 'plugin:vue/recommended', 'plugin:jest/recommended', 'prettier', 'prettier/vue', 'plugin:json/recommended'],
     globals: {
         Atomics: 'readonly',
         SharedArrayBuffer: 'readonly',
@@ -19,11 +19,11 @@ module.exports = {
         'prettier/prettier': [
             'error',
             {
-                tabWidth: 4,
+                tabWidth: 2,
                 printWidth: 200,
-                vueIndentScriptAndStyle: false,
+                vueIndentScriptAndStyle: true,
                 semi: false,
-                singleQuote: true,
+                singleQuote: false,
                 quoteProps: 'as-needed',
             },
         ],
