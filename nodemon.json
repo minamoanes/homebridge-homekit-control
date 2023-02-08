@@ -1,10 +1,10 @@
 {
-    "ignore": ["**/*.test.ts", "**/*.spec.ts", "node_modules"],
-    "watch": ["src"],
-    "exec": "tsc && homebridge -I -D -Q",
-    "signal": "SIGTERM",
-    "env": {
-        "NODE_OPTIONS": "--trace-warnings"
-    },
-    "ext": "ts"
+  "ignore": ["**/*.test.ts", "**/*.spec.ts", "node_modules"],
+  "watch": ["src"],
+  "exec": "tsc && homebridge -I -D -Q",
+  "signal": "SIGTERM",
+  "env": {
+    "NODE_OPTIONS": "--trace-warnings"
+  },
+  "ext": "ts"
 }

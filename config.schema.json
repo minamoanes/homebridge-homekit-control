@@ -1,116 +1,116 @@
 {
-    "pluginAlias": "HomekitControl",
-    "pluginType": "platform",
-    "singular": true,
-    "schema": {
-        "type": "object",
-        "properties": {
-            "services": {
-                "type": "array",
-                "items": {
-                    "title": "Device",
-                    "type": "object",
-                    "properties": {
-                        "uniquePrefix": {
-                            "title": "Prefix",
-                            "type": "string",
-                            "required": false,
-                            "description": "When the same device is added to multiple HomeBridge Isntances, you should add a unqiue Prefix."
-                        },
-                        "name": {
-                            "title": "Name",
-                            "type": "string",
-                            "required": false,
-                            "placeholder": "Enter a Custom Name",
-                            "description": "The Plugin will receive the Name from the Device. You may overrride that default name here."
-                        },
-                        "logFoundServices": {
-                            "title": "Log Source Services",
-                            "type": "boolean",
-                            "required": false,
-                            "default": false,
-                            "description": "When enabled, we will dump all discovered services from the source Device to the Homebridge Log."
-                        },
-                        "proxyAll": {
-                            "title": "Proxy All",
-                            "type": "boolean",
-                            "required": false,
-                            "default": false,
-                            "description": "When enabled, we will Proxy everything from connected clients. This does not filter any requests and may is of course untested for unkwnown services but it will enable devices that are not yet manually configured"
-                        },
-                        "enableHistory": {
-                            "title": "Enable History",
-                            "type": "boolean",
-                            "required": true,
-                            "default": false,
-                            "description": "Enables FakeGato for compatible Devices. This will enable the History Display in the EVE-App."
-                        },
-                        "historyInterval": {
-                            "title": "Enable History",
-                            "type": "integer",
-                            "required": false,
-                            "default": 600,
-                            "description": "Interval between measurements for the History Service (in Seconds)",
-                            "minimum": 30,
-                            "maximum": 600
-                        },
-                        "id": {
-                            "title": "Accessory ID",
-                            "type": "string",
-                            "required": true,
-                            "placeholder": "id"
-                        },
-                        "address": {
-                            "title": "Device IP",
-                            "type": "string",
-                            "required": true,
-                            "placeholder": "address"
-                        },
-                        "port": {
-                            "title": "Device Port",
-                            "type": "integer",
-                            "required": true,
-                            "placeholder": "port"
-                        },
-                        "pairingData": {
-                            "title": "Pairing Credentials",
-                            "type": "object",
-                            "properties": {
-                                "AccessoryPairingID": {
-                                    "title": "Accessory Pairing ID",
-                                    "type": "string",
-                                    "required": true,
-                                    "placeholder": "pairingData.AccessoryPairingID"
-                                },
-                                "AccessoryLTPK": {
-                                    "title": "Accessory LTPK",
-                                    "type": "string",
-                                    "required": true,
-                                    "placeholder": "pairingData.AccessoryLTPK"
-                                },
-                                "iOSDevicePairingID": {
-                                    "title": "iOS Pairing ID",
-                                    "type": "string",
-                                    "required": true,
-                                    "placeholder": "pairingData.iOSDevicePairingID"
-                                },
-                                "iOSDeviceLTSK": {
-                                    "title": "iOS Pairing LTSK",
-                                    "type": "string",
-                                    "required": true,
-                                    "placeholder": "pairingData.iOSDeviceLTSK"
-                                },
-                                "iOSDeviceLTPK": {
-                                    "title": "iOS Pairing LTPK",
-                                    "type": "string",
-                                    "required": true,
-                                    "placeholder": "pairingData.iOSDeviceLTPK"
-                                }
-                            }
-                        }
-                    }
+  "pluginAlias": "HomekitControl",
+  "pluginType": "platform",
+  "singular": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "services": {
+        "type": "array",
+        "items": {
+          "title": "Device",
+          "type": "object",
+          "properties": {
+            "uniquePrefix": {
+              "title": "Prefix",
+              "type": "string",
+              "required": false,
+              "description": "When the same device is added to multiple HomeBridge Isntances, you should add a unqiue Prefix."
+            },
+            "name": {
+              "title": "Name",
+              "type": "string",
+              "required": false,
+              "placeholder": "Enter a Custom Name",
+              "description": "The Plugin will receive the Name from the Device. You may overrride that default name here."
+            },
+            "logFoundServices": {
+              "title": "Log Source Services",
+              "type": "boolean",
+              "required": false,
+              "default": false,
+              "description": "When enabled, we will dump all discovered services from the source Device to the Homebridge Log."
+            },
+            "proxyAll": {
+              "title": "Proxy All",
+              "type": "boolean",
+              "required": false,
+              "default": false,
+              "description": "When enabled, we will Proxy everything from connected clients. This does not filter any requests and may is of course untested for unkwnown services but it will enable devices that are not yet manually configured"
+            },
+            "enableHistory": {
+              "title": "Enable History",
+              "type": "boolean",
+              "required": true,
+              "default": false,
+              "description": "Enables FakeGato for compatible Devices. This will enable the History Display in the EVE-App."
+            },
+            "historyInterval": {
+              "title": "Enable History",
+              "type": "integer",
+              "required": false,
+              "default": 600,
+              "description": "Interval between measurements for the History Service (in Seconds)",
+              "minimum": 30,
+              "maximum": 600
+            },
+            "id": {
+              "title": "Accessory ID",
+              "type": "string",
+              "required": true,
+              "placeholder": "id"
+            },
+            "address": {
+              "title": "Device IP",
+              "type": "string",
+              "required": true,
+              "placeholder": "address"
+            },
+            "port": {
+              "title": "Device Port",
+              "type": "integer",
+              "required": true,
+              "placeholder": "port"
+            },
+            "pairingData": {
+              "title": "Pairing Credentials",
+              "type": "object",
+              "properties": {
+                "AccessoryPairingID": {
+                  "title": "Accessory Pairing ID",
+                  "type": "string",
+                  "required": true,
+                  "placeholder": "pairingData.AccessoryPairingID"
+                },
+                "AccessoryLTPK": {
+                  "title": "Accessory LTPK",
+                  "type": "string",
+                  "required": true,
+                  "placeholder": "pairingData.AccessoryLTPK"
+                },
+                "iOSDevicePairingID": {
+                  "title": "iOS Pairing ID",
+                  "type": "string",
+                  "required": true,
+                  "placeholder": "pairingData.iOSDevicePairingID"
+                },
+                "iOSDeviceLTSK": {
+                  "title": "iOS Pairing LTSK",
+                  "type": "string",
+                  "required": true,
+                  "placeholder": "pairingData.iOSDeviceLTSK"
+                },
+                "iOSDeviceLTPK": {
+                  "title": "iOS Pairing LTPK",
+                  "type": "string",
+                  "required": true,
+                  "placeholder": "pairingData.iOSDeviceLTPK"
                 }
+              }
             }
+          }
         }
+      }
     }
+  }
 }

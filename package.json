@@ -1,30 +1,9 @@
 {
   "name": "homebridge-homekit-control",
-  "alias": "HomekitControl",
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com:minamoanes/homebridge-homekit-control.git"
-  },
-  "version": "0.2.0-1",
-  "bin": {
-    "homekitPair": "./cli.js"
-  },
-  "main": "dist/index.js",
-  "scripts": {
-    "lint": "eslint src/**.ts --max-warnings=0",
-    "dev": "npm run build && npm link && nodemon",
-    "build": "rimraf ./dist && tsc",
-    "local": "npm run build && npm link",
-    "gobeta": "npm version prepatch --preid beta && npm publish --tag=beta",
-    "prepublishOnly": "npm run lint && npm run build"
-  },
   "description": "Homebridge Homekit Control allows you to control HomeKit-enabled Devices directly from within HomeBridege. (Based on previous versions develped by MartinPham and frank.bauer)",
+  "alias": "HomekitControl",
   "author": "minamoanes",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/minamoanes/homebridge-homekit-control/issues"
-  },
-  "homepage": "https://github.com/minamoanes/homebridge-homekit-control#readme",
+  "version": "0.2.0-beta-2",
   "keywords": [
     "homebridge-plugin",
     "homebridge",
@@ -35,13 +14,30 @@
     "homekit",
     "fakegato"
   ],
+  "homepage": "https://github.com/minamoanes/homebridge-homekit-control#readme",
+  "bugs": {
+    "url": "https://github.com/minamoanes/homebridge-homekit-control/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:minamoanes/homebridge-homekit-control.git"
+  },
+  "scripts": {
+    "lint": "eslint src/**.ts --max-warnings=0",
+    "dev": "npm run build && npm link && nodemon",
+    "build": "rimraf ./dist && tsc",
+    "local": "npm run build && npm link",
+    "gobeta": "npm version prepatch --preid beta && npm publish --tag=beta",
+    "prepublishOnly": "npm run lint && npm run build"
+  },
   "engines": {
-    "homebridge": "^1.5.1",
+    "homebridge": "^1.6.0",
     "node": "^14.20.1 || ^16.17.1 || ^18.12.0"
   },
-  "funding": {
-    "type": "paypal",
-    "url": "https://paypal.me/MinaMoanes"
+  "license": "MIT",
+  "main": "dist/index.js",
+  "bin": {
+    "homekitPair": "./cli.js"
   },
   "dependencies": {
     "cli-progress": "^3.11.2",
@@ -49,25 +45,29 @@
     "command-line-args": "^5.2.1",
     "command-line-usage": "^6.1.3",
     "fakegato-history": "^0.6.3",
-    "hap-controller": "^0.8.1"
+    "hap-controller": "^0.9.2"
   },
   "devDependencies": {
-    "@types/node": "^14.18.0",
-    "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "@typescript-eslint/parser": "^4.33.0",
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^7.2.0",
-    "eslint-import-resolver-typescript": "^2.5.0",
-    "eslint-plugin-html": "^6.2.0",
-    "eslint-plugin-import": "^2.25.3",
-    "eslint-plugin-json": "^2.1.2",
-    "eslint-plugin-prettier": "^3.4.1",
-    "eslint-plugin-vue": "^7.20.0",
-    "homebridge": "^1.5.0",
-    "nodemon": "^2.0.19",
-    "prettier": "^2.5.1",
-    "rimraf": "^3.0.2",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.5.3"
+    "@types/node": "^18.13.0",
+    "@typescript-eslint/eslint-plugin": "^5.51.0",
+    "@typescript-eslint/parser": "^5.51.0",
+    "eslint": "^8.33.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-import-resolver-typescript": "^3.5.3",
+    "eslint-plugin-html": "^7.1.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-json": "^3.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-vue": "^9.9.0",
+    "homebridge": "^1.6.0",
+    "nodemon": "^2.0.20",
+    "prettier": "^2.8.3",
+    "rimraf": "^4.1.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5"
+  },
+  "funding": {
+    "type": "paypal",
+    "url": "https://paypal.me/MinaMoanes"
   }
 }
