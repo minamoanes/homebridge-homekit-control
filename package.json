@@ -22,6 +22,7 @@
     "type": "git",
     "url": "git+ssh://git@github.com:minamoanes/homebridge-homekit-control.git"
   },
+  "license": "Apache-2.0",
   "scripts": {
     "lint": "eslint src/**.ts --max-warnings=0",
     "dev": "npm run build && npm link && nodemon",
@@ -34,7 +35,6 @@
     "homebridge": "^1.6.0",
     "node": "^14.20.1 || ^16.17.1 || ^18.12.0"
   },
-  "license": "MIT",
   "main": "dist/index.js",
   "bin": {
     "homekitPair": "./cli.js"
