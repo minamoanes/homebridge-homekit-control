@@ -135,14 +135,15 @@ if (options.help !== undefined) {
     console.log(`\u274C ${error?.message}`);
     if (error?.message?.includes("M2: Error: 6")) {
       console.error(
-        "=> Check how to fix the (M2: Error 6) here:\n  https://github.com/minamoanes/homebridge-homekit-control#how-to-fix-known-errors"
+        `\u27A1 Check how to fix the (M2: Error 6) here:\n  https://github.com/minamoanes/homebridge-homekit-control#how-to-fix-known-errors`
       );
-    } else {
+    } else if (!error?.message?.includes("Invalid Pin")) {
       console.error(
-        `=> For further support check here:\n  https://github.com/minamoanes/homebridge-homekit-control`
+        `\u27A1 For further support check the Repo documentation or open an issue:\n  https://github.com/minamoanes/homebridge-homekit-control`
       );
     }
     console.log("\n-------------------------------\n\n");
+    process.exit(1);
   };
 
   const pairService = (service) =>
@@ -151,52 +152,58 @@ if (options.help !== undefined) {
         input: process.stdin,
         output: process.stdout,
       });
+
       console.clear();
+
       rl.question(
         `Enter PIN for ${service.name} (XXX-XX-XXX or XXXX-XXXX or XXXXXXXX): `,
         async (pin) => {
           const pinex = /(\d{3})-(\d{2})-(\d{3})|(\d{4})-(\d{4})|(\d{8})/;
-          let m = ((pin || "").match(pinex) || []).filter(
+
+          const m = ((pin || "").match(pinex) || []).filter(
             (e) => e !== undefined
           );
-          if (m.length == 4) {
+
+          if (m.length === 4) {
             pin = m[0];
-          } else if (m.length == 3) {
-            const p = m[1] + m[2];
-            pin = p.substr(0, 3) + "-" + p.substr(3, 2) + "-" + p.substr(5, 3);
-          } else if (m.length == 2) {
-            const p = m[0];
-            pin = p.substr(0, 3) + "-" + p.substr(3, 2) + "-" + p.substr(5, 3);
+          } else if (m.length === 3 || m.length === 2) {
+            const p = m.length === 3 ? m[1] + m[2] : m[0];
+            pin = [p.slice(0, 3), p.slice(3, 5), p.slice(5, 8)].join("-");
           } else {
-            reject("Invalid Pin: ", pin);
+            return errorCallback(new Error("Invalid Pin: " + pin));
           }
+
           console.log(`Pin: ${pin}`);
           rl.close();
 
-          const discovery = new IPDiscovery();
-          const pairMethod = await discovery.getPairMethod(service);
-          const ipClient = new HttpClient(
-            service.id,
-            service.address,
-            service.port
-          );
-
-          ipClient.setCharacteristics({
-            "2.10": true,
-            iid: service.id,
-          });
-
           try {
+            const discovery = new IPDiscovery();
+            const pairMethod = await discovery.getPairMethod(service);
+            const ipClient = new HttpClient(
+              service.id,
+              service.address,
+              service.port
+            );
+
+            ipClient.setCharacteristics({
+              "2.10": true,
+              iid: service.id,
+            });
+
             await ipClient.pairSetup(pin, pairMethod);
-            resolve(ipClient);
+            return resolve(ipClient);
           } catch (error) {
-            errorCallback(error);
+            return errorCallback(error);
           }
         }
       );
     });
 
-  const client = await pairService(service);
+  try {
+    const client = await pairService(service);
+  } catch (error) {
+    errorCallback(error);
+  }
 
   const saveServiceData = (service, client) =>
     new Promise((resolve, reject) => {
