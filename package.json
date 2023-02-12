@@ -1,4 +1,5 @@
 {
+  "displayName": "Homebridge Homekit Control",
   "name": "homebridge-homekit-control",
   "description": "Homebridge Homekit Control allows you to control HomeKit-enabled Devices directly from within HomeBridege. (Based on previous versions develped by MartinPham and frank.bauer)",
   "alias": "HomekitControl",
