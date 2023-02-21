@@ -1,44 +1,41 @@
-<div align="center">
+<p align="center">
 
-<img src="https://developer.apple.com/assets/elements/icons/homekit/homekit-96x96_2x.png" width="100px" />
-<img src="https://cdn-icons-png.flaticon.com/512/1294/1294463.png" width="50px" />
-<img src="https://raw.githubusercontent.com/homebridge/branding/master/logos/homebridge-color-round-stylized.png" width="100px" />
+<a href="https://github.com/minamoanes/homebridge-homekit-control">
+    <img src="homebridge-homekit-control.png" width="250" />
+</a>
 
 # Homebridge HomeKit Control
 
-<a href="https://www.npmjs.com/package/homebridge-homekit-control"><img title="npm version" src="https://badgen.net/npm/v/homebridge-homekit-control?label=stable"></a>
-<a href="https://www.npmjs.com/package/homebridge-homekit-control"><img title="npm downloads" src="https://badgen.net/npm/dt/homebridge-homekit-control"></a>
 [![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
+[![npm](https://badgen.net/npm/v/homebridge-homekit-control)](https://www.npmjs.com/package/homebridge-homekit-control)
+[![downloads](https://badgen.net/npm/dt/homebridge-homekit-control)](https://www.npmjs.com/package/homebridge-homekit-control)
+[![donate](https://badgen.net/badge/PayPal/donate/003087?icon=https://simpleicons.now.sh/paypal/fff)](https://paypal.me/MinaMoanes)
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/MinaMoanes)
+</p>
 
-</div>
+**HomeKit Control** lets you control <img src="icons/homekit-icon.svg" width="15" /> Apple HomeKit Exclusive accessories through Homebridge, This is especially useful to gain all the benefits of Homebridge alongside controlling them using other services and plugins through Homebridge, such as:
 
-**HomeKit Control** allows you to control HomeKit enabled devices from Homebridge.
+- <img src="icons/google-assistant-icon.svg" width="15" /> Google Assistant (using `homebridge-gsh` plugin)
+- <img src="icons/alexa-icon.svg" width="15" /> Amazon Alexa (using `homebridge-alexa` plugin)
+- and many more...
 
-This is especially usefull if you want to control HomeKit Exclusive devices and accessories through:
+## Supported Devices
 
-- <img src="https://user-images.githubusercontent.com/17292320/180973891-14c38bef-4a17-4733-b103-3cf002755b69.png" width="20" /> **Google Assistant** (using `homebridge-gsh` plugin)
-- <img src="https://user-images.githubusercontent.com/17292320/180974563-0fd9a3d9-6f4f-4d57-a7c2-9e61aea04903.png" width="20" /> **Amazon Alexa** (using `homebridge-alexa` plugin)
-- and of course still controllable from <img src="https://user-images.githubusercontent.com/17292320/180978863-c58e839b-4d31-4860-8235-b69991767460.png" width="20" /> **Apple HomeKit** though Homebridge.
+The Plugin currently supports the following Services provided by WLAN-based HomeKit enabled devices:
 
-The Plugin currently supports the following Services provided by **WLAN**-based HomeKit enabled devices:
+- Switch
+- Outlet
+- Motion Sensors
+- Temperatur Sensors
+- Humidity Sensors
+- CO2 Sensors
+- Carbon Monoxid Sensors
+- Air Quality Sensors
+- Ambient Light Sensors
+- Light Bulbs
+- Battery/Charging State
 
-- `Switch`
-- `Outlet`
-- `Motion Sensors`
-- `Temperatur Sensors`
-- `Humidity Sensors`
-- `CO2 Sensors`
-- `Carbon Monoxid Sensors`
-- `Air Quality Sensors`
-- `Ambient Light Sensors`
-- `Light Bulbs`
-- `Battery/Charging State`
-
-BLE is currently not supported, as it seems to be unstable when multiple BLE-enabled Plugins are installed.
-
-All supported sensors on any configured device are automatically dicovered and added when Homebridge starts up.
+Please note that BLE is currently not supported, as it seems to be unstable when multiple BLE-enabled Plugins are installed. All supported sensors on any configured device are automatically discovered and added when Homebridge starts up.
 
 ## Install
 
@@ -46,52 +43,43 @@ All supported sensors on any configured device are automatically dicovered and a
 sudo npm i -g homebridge-homekit-control
 ```
 
-## Pair devices
+## Pairing Devices
 
-### Discover Devices
+To pair your devices with Homebridge HomeKit Control, follow these steps:
 
-```
-homekitPair [network] [interface]
-```
+1.  Discover Devices:
+    ```
+    homekitPair
+    ```
+    - You could also: `homekitPair [network] [interface]`, for example: `homekitPair -i wlan0`
+2.  Select the device you want to pair, and enter the pairing code (including `-`, example `123-45-678`).
+3.  Enter a filename to save pairing information in JSON format.
+4.  In the JSON file, you'll find the following information:
 
-#### Example
-
-```
-homekitPair
-```
-
-or
-
-```
-homekitPair -i wlan0
-```
-
-- Select device, and enter code to pair (including `-`, example `123-45-678`)
-- Enter filename to save pairing's informations JSON
-- Inside the JSON file, you can find
-
-```
-{
-    "id": "device id",
-    "name": "device name",
-    "address": "device ip",
-    "port": device-port,
-    "pairingData": {
-        "AccessoryPairingID": "xxx",
-        "AccessoryLTPK": "xxx",
-        "iOSDevicePairingID": "xxx",
-        "iOSDeviceLTSK": "xxx",
-        "iOSDeviceLTPK": "xxx"
-    },
-    "accessories": {
-        "accessories": [...]
+    ```
+    {
+        "id": "device id",
+        "name": "device name",
+        "address": "device ip",
+        "port": device-port,
+        "pairingData": {
+            "AccessoryPairingID": "xxx",
+            "AccessoryLTPK": "xxx",
+            "iOSDevicePairingID": "xxx",
+            "iOSDeviceLTSK": "xxx",
+            "iOSDeviceLTPK": "xxx"
+        },
+        "accessories": {
+            "accessories": [...]
+        }
     }
-}
-```
+    ```
 
-- Note down the `"id"`, `"name"`, `"address"`, `"port"` and `"pairingData"`
+5.  Note down the `"id"`, `"name"`, `"address"`, `"port"` and `"pairingData"` from the JSON file.
+6.  Go to **Plugins** page and Click on the **SETTINGS** button under **Homebridge Homekit Control** and fille out the information we noted from the JSON file in the previous steps
+    - For further information, please refer to the [Config](#config) section for details.
 
-### Config
+## Config
 
 This Plugin supports the Configuration Interface in Homebridge UI (homebridge-config-ui-x). Simply add a new Device and paste the values you obtained above.
 
