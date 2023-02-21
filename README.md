@@ -1,7 +1,7 @@
-<p align="center">
+<div align="center">
 
 <a href="https://github.com/minamoanes/homebridge-homekit-control">
-    <img src="homebridge-homekit-control.png" width="250" />
+    <img src="https://github.com/minamoanes/homebridge-homekit-control/blob/master/homebridge-homekit-control.png" width="250" />
 </a>
 
 # Homebridge HomeKit Control
@@ -11,12 +11,12 @@
 [![downloads](https://badgen.net/npm/dt/homebridge-homekit-control)](https://www.npmjs.com/package/homebridge-homekit-control)
 [![donate](https://badgen.net/badge/PayPal/donate/003087?icon=https://simpleicons.now.sh/paypal/fff)](https://paypal.me/MinaMoanes)
 
-</p>
+</div>
 
-**HomeKit Control** lets you control <img src="icons/homekit-icon.svg" width="15" /> Apple HomeKit Exclusive accessories through Homebridge, This is especially useful to gain all the benefits of Homebridge alongside controlling them using other services and plugins through Homebridge, such as:
+**HomeKit Control** lets you control <img src="https://github.com/minamoanes/homebridge-homekit-control/blob/master/icons/homekit-icon.svg" width="15" /> Apple HomeKit Exclusive accessories through Homebridge, This is especially useful to gain all the benefits of Homebridge alongside controlling them using other services and plugins through Homebridge, such as:
 
-- <img src="icons/google-assistant-icon.svg" width="15" /> Google Assistant (using `homebridge-gsh` plugin)
-- <img src="icons/alexa-icon.svg" width="15" /> Amazon Alexa (using `homebridge-alexa` plugin)
+- <img src="https://github.com/minamoanes/homebridge-homekit-control/blob/master/icons/google-assistant-icon.svg" width="15" /> Google Assistant (using `homebridge-gsh` plugin)
+- <img src="https://github.com/minamoanes/homebridge-homekit-control/blob/master/icons/alexa-icon.svg" width="15" /> Amazon Alexa (using `homebridge-alexa` plugin)
 - and many more...
 
 ## Supported Devices
