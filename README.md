@@ -1,4 +1,4 @@
-<p align="center">
+<div align="center">
 
 <a href="https://github.com/minamoanes/homebridge-homekit-control">
     <img src="homebridge-homekit-control.png" width="250" />
@@ -11,7 +11,7 @@
 [![downloads](https://badgen.net/npm/dt/homebridge-homekit-control)](https://www.npmjs.com/package/homebridge-homekit-control)
 [![donate](https://badgen.net/badge/PayPal/donate/003087?icon=https://simpleicons.now.sh/paypal/fff)](https://paypal.me/MinaMoanes)
 
-</p>
+</div>
 
 **HomeKit Control** lets you control <img src="icons/homekit-icon.svg" width="15" /> Apple HomeKit Exclusive accessories through Homebridge, This is especially useful to gain all the benefits of Homebridge alongside controlling them using other services and plugins through Homebridge, such as:
 
