@@ -197,8 +197,8 @@ export class HKClient implements IHKClient {
             if (val !== undefined) {
               c.value = val.value;
             }
-          })
-        )
+          }),
+        ),
       );
     }
   }
@@ -292,7 +292,7 @@ export class HKClient implements IHKClient {
             .join("\n - ");
           return `Accessory ${i + 1}:\n - ${services}`;
         })
-        .join("\n")
+        .join("\n"),
     );
   }
 
