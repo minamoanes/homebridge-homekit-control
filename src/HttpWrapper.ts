@@ -132,7 +132,7 @@ export class HttpWrapper {
         return self.client.identify();
       },
       "identify",
-      "-"
+      "-",
     );
   }
   public getAccessories(): Promise<Record<string, unknown>> {
@@ -142,7 +142,7 @@ export class HttpWrapper {
         return self.client.getAccessories();
       },
       "getAccessories",
-      "-"
+      "-",
     );
   }
 
@@ -158,7 +158,7 @@ export class HttpWrapper {
         return self.client.getCharacteristics(characteristics, options);
       },
       "getCharacteristics",
-      characteristics.join(", ")
+      characteristics.join(", "),
     );
   }
 
@@ -171,7 +171,7 @@ export class HttpWrapper {
       "setCharacteristics",
       Object.keys(characteristics)
         .map((k) => `${k}=${characteristics[k]}`)
-        .join(", ")
+        .join(", "),
     );
   }
 
@@ -184,7 +184,7 @@ export class HttpWrapper {
         return self.client.subscribeCharacteristics(characteristics);
       },
       "subscribeCharacteristics",
-      characteristics.join(", ")
+      characteristics.join(", "),
     );
   }
 
