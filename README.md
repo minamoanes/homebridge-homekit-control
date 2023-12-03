@@ -34,6 +34,7 @@ The Plugin currently supports the following Services provided by WLAN-based Home
 - Ambient Light Sensors
 - Light Bulbs
 - Battery/Charging State
+- Garage Door Opener (Thanks to vmummer)
 
 Please note that BLE is currently not supported, as it seems to be unstable when multiple BLE-enabled Plugins are installed. All supported sensors on any configured device are automatically discovered and added when Homebridge starts up.
 
