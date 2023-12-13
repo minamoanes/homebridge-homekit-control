@@ -4,7 +4,7 @@
   "description": "Homebridge Homekit Control allows you to control HomeKit-enabled Devices directly from within HomeBridege. (Based on previous versions develped by MartinPham and frank.bauer)",
   "alias": "HomekitControl",
   "author": "minamoanes",
-  "version": "0.2.3-beta-1",
+  "version": "0.2.3",
   "keywords": [
     "homebridge-plugin",
     "homebridge",
@@ -69,12 +69,12 @@
   },
   "funding": [
     {
-      "type": "github",
-      "url": "https://github.com/minamoanes"
-    },
-    {
       "type": "paypal",
       "url": "https://paypal.me/MinaMoanes"
+    },
+    {
+      "type": "github",
+      "url": "https://github.com/minamoanes"
     }
   ]
 }
