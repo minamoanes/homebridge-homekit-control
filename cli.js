@@ -176,12 +176,6 @@ if (options.help !== undefined) {
       });
     });
 
-  try {
-    const client = await pairService(service);
-  } catch (error) {
-    errorCallback(error);
-  }
-
   const saveServiceData = (service, client) =>
     new Promise((resolve, reject) => {
       console.log("\n\n");
@@ -234,9 +228,16 @@ if (options.help !== undefined) {
       // )
     });
 
-  const data = await saveServiceData(service, client);
-  console.log("\n\n");
-  console.log("Paired with Service:");
-  console.log(data);
-  process.exit();
+  try {
+    const client = await pairService(service);
+    const data = await saveServiceData(service, client);
+
+    console.log("\n\n");
+    console.log("Paired with Service:");
+    console.log(data);
+
+    process.exit();
+  } catch (error) {
+    errorCallback(error);
+  }
 })();
