@@ -72,7 +72,7 @@ if (options.help !== undefined) {
           format: "Discovering Homekit Accessories | {bar} | {percentage}% | ETA: {eta}s",
           hideCursor: false,
         },
-        cliProgress.Presets.rect
+        cliProgress.Presets.rect,
       );
 
       progressBar.start(100, 0);
@@ -115,7 +115,7 @@ if (options.help !== undefined) {
           }
           const service = services[response.id];
           resolve(service);
-        }
+        },
       );
     });
 
@@ -167,11 +167,6 @@ if (options.help !== undefined) {
           const discovery = new IPDiscovery();
           const pairMethod = await discovery.getPairMethod(service);
           const ipClient = new HttpClient(service.id, service.address, service.port);
-
-          ipClient.setCharacteristics({
-            "2.10": true,
-            iid: service.id,
-          });
 
           await ipClient.pairSetup(pin, pairMethod);
           return resolve(ipClient);
