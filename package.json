@@ -27,7 +27,7 @@
   "scripts": {
     "lint": "eslint src/**.ts --max-warnings=0",
     "dev": "npm run build && npm link && nodemon",
-    "build": "rimraf ./dist && tsc",
+    "build": "rm -rf ./dist && tsc",
     "local": "npm run build && npm link",
     "gobeta": "npm version prepatch --preid beta && npm publish --tag=beta",
     "prepublishOnly": "npm run lint && npm run build"
@@ -63,9 +63,11 @@
     "homebridge": "^1.8.2",
     "nodemon": "^3.1.3",
     "prettier": "^3.3.1",
-    "rimraf": "^5.0.7",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
+  },
+  "overrides": {
+    "tar": ">=7.2.0"
   },
   "funding": [
     {
