@@ -14,7 +14,6 @@ export function listKnownServices(api: API, parent: SupportedServices): WithUUID
     api.hap.Service.AccessoryInformation,
     api.hap.Service.Switch,
     api.hap.Service.MotionSensor,
-    api.hap.Service.BatteryService,
     api.hap.Service.Battery,
     api.hap.Service.Lightbulb,
     api.hap.Service.Outlet,
