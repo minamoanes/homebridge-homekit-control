@@ -4,7 +4,7 @@
   "description": "Homebridge Homekit Control allows you to control HomeKit-enabled Devices directly from within HomeBridege. (Based on previous versions develped by MartinPham and frank.bauer)",
   "alias": "HomekitControl",
   "author": "minamoanes",
-  "version": "0.2.7",
+  "version": "0.3.0-beta.0",
   "keywords": [
     "homebridge-plugin",
     "homebridge",
@@ -34,9 +34,10 @@
     "prepublishOnly": "npm run lint && npm run build"
   },
   "engines": {
-    "homebridge": "^1.8.2",
-    "node": "^22||^20||^18||^16"
+    "homebridge": "^1.9.0||^2.0.0-beta",
+    "node": "^22||^20||^18"
   },
+  "type": "module",
   "main": "dist/index.js",
   "bin": {
     "homekitPair": "./cli.js"
@@ -44,10 +45,10 @@
   "dependencies": {
     "cli-progress": "^3.12.0",
     "cli-select": "^1.1.2",
-    "command-line-args": "^6.0.0",
+    "command-line-args": "^6.0.1",
     "command-line-usage": "^7.0.3",
-    "fakegato-history": "^0.6.5",
-    "hap-controller": "^0.10.1"
+    "fakegato-history": "^0.6.6",
+    "hap-controller": "^0.10.2"
   },
   "devDependencies": {
     "@types/node": "^20.14.2",
