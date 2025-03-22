@@ -37,7 +37,6 @@
     "homebridge": "^1.9.0||^2.0.0-beta",
     "node": "^22||^20||^18"
   },
-  "type": "module",
   "main": "dist/index.js",
   "bin": {
     "homekitPair": "./cli.js"
